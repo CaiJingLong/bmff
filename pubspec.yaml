@@ -1,7 +1,7 @@
 name: bmff
 description: The package provides a library for reading ISO Base Media File Format (BMFF) files.
 version: 1.0.0
-homepage:
+homepage: https://github.com/CaiJingLong/bmff
 
 environment:
   sdk: ">=2.12.0 <3.0.0"
