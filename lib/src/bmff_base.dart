@@ -42,7 +42,7 @@ class Bmff {
     var startIndex = 0;
 
     while (startIndex < length) {
-      final box = context.makeBox(startIndex);
+      final box = context.makeBox(startIndex: startIndex, parent: null);
       context.boxes.add(box);
       startIndex += box.size;
     }

@@ -15,10 +15,14 @@ class BmffBox {
     required this.type,
     required this.extendedSize,
     required this.startOffset,
+    this.extendInfoSize = 0,
   });
 
   /// {@macro bmff.bmff_context}
   final BmffContext context;
+
+  /// The parent box of this box, or null if this box is the root box.
+  BmffBox? parent;
 
   /// The size of the box. Contains the header size.
   final int size;
@@ -70,6 +74,10 @@ class BmffBox {
     return 8;
   }
 
+  /// Some boxes have some extended data.
+  /// For example, meta of heic have 4 bytes extended data.
+  int extendInfoSize;
+
   /// The child boxes of the box.
   late List<BmffBox> childBoxes = _decodeChildBoxes();
 
@@ -78,12 +86,17 @@ class BmffBox {
     final result = <BmffBox>[];
 
     final startIndex = headerSize;
-    var currentIndex = startIndex;
+    var currentIndex = startIndex + extendInfoSize;
 
     while (currentIndex < endOffset) {
-      final box = context.makeBox(currentIndex);
+      final box = context.makeBox(startIndex: startIndex, parent: this);
       result.add(box);
       currentIndex = box.endOffset;
+
+      if (parent != null && currentIndex > parent!.endOffset) {
+        throw Exception('Invalid box');
+        // return [];
+      }
     }
 
     return result;

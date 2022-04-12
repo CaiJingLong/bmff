@@ -1,4 +1,5 @@
 import 'package:bmff/bmff.dart';
+import 'package:bmff/src/box/box_factory.dart';
 
 /// {@template bmff.bmff_context}
 ///
@@ -29,54 +30,9 @@ abstract class BmffContext {
   void close();
 
   /// Decode [BmffBox] from [startIndex].
-  BmffBox makeBox(int startIndex) {
-    final size = getRangeData(startIndex, startIndex + 4).toBigEndian();
-    final type = getRangeData(startIndex + 4, startIndex + 8).toAsciiString();
-
-    if (size == 0) {
-      return BmffBox(
-        context: this,
-        size: size,
-        type: type,
-        extendedSize: 0,
-        startOffset: startIndex,
-      );
-    }
-    if (size == 1) {
-      // Full box, read the extended size, from the next 8 bytes
-      final extendedSize =
-          getRangeData(startIndex + 8, startIndex + 16).toBigEndian();
-
-      return BmffBox(
-        context: this,
-        size: 1,
-        type: type,
-        extendedSize: extendedSize,
-        startOffset: startIndex,
-      );
-    }
-
-    if (size < 8) {
-      throw Exception('Invalid size');
-    }
-
-    if (type == 'ftyp') {
-      return FtypeBox(
-        context: this,
-        size: size,
-        type: type,
-        dataSize: size - 8,
-        startOffset: startIndex,
-      );
-    }
-
-    return BmffBox(
-      context: this,
-      size: size,
-      type: type,
-      extendedSize: 0,
-      startOffset: startIndex,
-    );
+  BmffBox makeBox({required int startIndex, BmffBox? parent}) {
+    final factory = BoxFactory();
+    return factory.makeBox(this, startIndex);
   }
 }
 
