@@ -8,7 +8,7 @@ void main() {
   final file = File(assetPath);
   final context = BmffIoContext(file);
 
-  final boxes = Bmff(context).convertToBox();
+  final boxes = Bmff(context).decodeBox();
   for (final box in boxes) {
     print(box);
   }

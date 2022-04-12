@@ -5,7 +5,7 @@ class Bmff {
 
   final BmffContext context;
 
-  List<BmffBox> convertToBox() {
+  List<BmffBox> decodeBox() {
     final length = context.length;
 
     // decode the data
