@@ -42,7 +42,7 @@ class Bmff {
     var startIndex = 0;
 
     while (startIndex < length) {
-      final box = _makeBox(startIndex);
+      final box = context.makeBox(startIndex);
       context.boxes.add(box);
       startIndex += box.size;
     }
@@ -54,58 +54,6 @@ class Bmff {
     }
 
     return context.boxes;
-  }
-
-  /// Decode [BmffBox] from [startIndex].
-  BmffBox _makeBox(int startIndex) {
-    final size = context.getRangeData(startIndex, startIndex + 4).toBigEndian();
-    final type =
-        context.getRangeData(startIndex + 4, startIndex + 8).toAsciiString();
-
-    if (size == 0) {
-      return BmffBox(
-        context: context,
-        size: size,
-        type: type,
-        extendedSize: 0,
-        startOffset: startIndex,
-      );
-    }
-    if (size == 1) {
-      // Full box, read the extended size, from the next 8 bytes
-      final extendedSize =
-          context.getRangeData(startIndex + 8, startIndex + 16).toBigEndian();
-
-      return BmffBox(
-        context: context,
-        size: 1,
-        type: type,
-        extendedSize: extendedSize,
-        startOffset: startIndex,
-      );
-    }
-
-    if (size < 8) {
-      throw Exception('Invalid size');
-    }
-
-    if (startIndex == 0) {
-      return FtypeBox(
-        context: context,
-        size: size,
-        type: type,
-        dataSize: size - 8,
-        startOffset: startIndex,
-      );
-    }
-
-    return BmffBox(
-      context: context,
-      size: size,
-      type: type,
-      extendedSize: 0,
-      startOffset: startIndex,
-    );
   }
 }
 

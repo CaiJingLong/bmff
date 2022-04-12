@@ -57,6 +57,38 @@ class BmffBox {
     return startOffset + size;
   }
 
+  /// The header size of the box.
+  int get headerSize {
+    if (size == 0) {
+      return 8;
+    }
+    if (size == 1) {
+      // full box, read the extended size, from the next 8 bytes
+      return 16;
+    }
+
+    return 8;
+  }
+
+  /// The child boxes of the box.
+  late List<BmffBox> childBoxes = _decodeChildBoxes();
+
+  /// See [childBoxes].
+  List<BmffBox> _decodeChildBoxes() {
+    final result = <BmffBox>[];
+
+    final startIndex = headerSize;
+    var currentIndex = startIndex;
+
+    while (currentIndex < endOffset) {
+      final box = context.makeBox(currentIndex);
+      result.add(box);
+      currentIndex = box.endOffset;
+    }
+
+    return result;
+  }
+
   @override
   String toString() {
     final realSize = extendedSize != 0 ? extendedSize : size;
