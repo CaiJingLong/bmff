@@ -29,6 +29,11 @@ class BmffBox {
   /// If the box is full box, it contains the extended size. Otherwise, it is 0.
   final int extendedSize;
 
+  /// The box real size;
+  int get realSize {
+    return endOffset - startOffset;
+  }
+
   /// The start offset of the box.
   final int startOffset;
 
