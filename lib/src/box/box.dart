@@ -42,10 +42,10 @@ class BmffBox {
   final int startOffset;
 
   /// The end offset of the box.
-  late int endOffset = getEndOffset();
+  late int endOffset = _getEndOffset();
 
   /// See [endOffset].
-  int getEndOffset() {
+  int _getEndOffset() {
     if (size == 0) {
       return startOffset + 8;
     }
@@ -83,23 +83,22 @@ class BmffBox {
 
   /// See [childBoxes].
   List<BmffBox> _decodeChildBoxes() {
-    final result = <BmffBox>[];
+    try {
+      final result = <BmffBox>[];
 
-    final startIndex = headerSize;
-    var currentIndex = startIndex + extendInfoSize;
+      final startIndex = headerSize;
+      var currentIndex = startIndex + extendInfoSize;
 
-    while (currentIndex < endOffset) {
-      final box = context.makeBox(startIndex: startIndex, parent: this);
-      result.add(box);
-      currentIndex = box.endOffset;
-
-      if (parent != null && currentIndex > parent!.endOffset) {
-        throw Exception('Invalid box');
-        // return [];
+      while (currentIndex < endOffset) {
+        final box = context.makeBox(startIndex: startIndex, parent: this);
+        result.add(box);
+        currentIndex = box.endOffset;
       }
-    }
 
-    return result;
+      return result;
+    } catch (e) {
+      return [];
+    }
   }
 
   @override

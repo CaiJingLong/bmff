@@ -7,9 +7,20 @@ import 'package:bmff/bmff.dart';
 /// {@endtemplate}
 class BoxFactory {
   BmffBox makeBox(BmffContext context, int startIndex, {BmffBox? parent}) {
+    final box = _makeBox(context, startIndex);
+    box.parent = parent;
+    if (parent != null && box.endOffset > parent.endOffset) {
+      throw Exception('Invalid box, end offset is larger than parent');
+    }
+    return box;
+  }
+
+  BmffBox _makeBox(BmffContext context, int startIndex) {
     final size = context.getRangeData(startIndex, startIndex + 4).toBigEndian();
-    final type =
-        context.getRangeData(startIndex + 4, startIndex + 8).toAsciiString();
+    final typeData = context.getRangeData(startIndex + 4, startIndex + 8);
+    _checkType(typeData);
+
+    final type = typeData.toAsciiString();
 
     if (size == 0) {
       return BmffBox(
@@ -55,5 +66,16 @@ class BoxFactory {
       extendedSize: 0,
       startOffset: startIndex,
     );
+  }
+
+  void _checkType(List<int> typeData) {
+    // type data must a-zA-Z0-9
+    for (final value in typeData) {
+      if (!((value >= 0x41 && value <= 0x5a) ||
+          (value >= 0x61 && value <= 0x7a) ||
+          (value >= 0x30 && value <= 0x39))) {
+        throw Exception('Invalid box type');
+      }
+    }
   }
 }

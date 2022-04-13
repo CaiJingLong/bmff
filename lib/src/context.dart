@@ -32,7 +32,7 @@ abstract class BmffContext {
   /// Decode [BmffBox] from [startIndex].
   BmffBox makeBox({required int startIndex, BmffBox? parent}) {
     final factory = BoxFactory();
-    return factory.makeBox(this, startIndex);
+    return factory.makeBox(this, startIndex, parent: parent);
   }
 }
 
