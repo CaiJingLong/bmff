@@ -95,9 +95,9 @@ class BmffBox {
       }
 
       return result;
-    } catch (e, st) {
-      // print(e);
-      // print(st);
+    } catch (e) {
+      // Here, all data is directly parsed as a box. When an error occurs,
+      // it is regarded as no sub box.
       return [];
     }
   }
