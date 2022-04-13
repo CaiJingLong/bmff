@@ -86,17 +86,18 @@ class BmffBox {
     try {
       final result = <BmffBox>[];
 
-      final startIndex = headerSize;
-      var currentIndex = startIndex + extendInfoSize;
+      var currentIndex = startOffset + headerSize + extendInfoSize;
 
       while (currentIndex < endOffset) {
-        final box = context.makeBox(startIndex: startIndex, parent: this);
+        final box = context.makeBox(startIndex: currentIndex, parent: this);
         result.add(box);
         currentIndex = box.endOffset;
       }
 
       return result;
-    } catch (e) {
+    } catch (e, st) {
+      // print(e);
+      // print(st);
       return [];
     }
   }

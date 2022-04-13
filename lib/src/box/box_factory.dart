@@ -74,7 +74,7 @@ class BoxFactory {
       if (!((value >= 0x41 && value <= 0x5a) ||
           (value >= 0x61 && value <= 0x7a) ||
           (value >= 0x30 && value <= 0x39))) {
-        throw Exception('Invalid box type');
+        throw Exception('Invalid box type, the type char list is $typeData');
       }
     }
   }
