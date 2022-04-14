@@ -14,6 +14,9 @@ abstract class BmffContext {
   /// The boxes of the context.
   final boxes = <BmffBox>[];
 
+  /// The all boxes of the context. All of boxes have been decoded.
+  late List<BmffBox> allBox = _allBox(this);
+
   /// The FTYP box of the context.
   late FtypeBox ftypeBox;
 
@@ -33,6 +36,26 @@ abstract class BmffContext {
   BmffBox makeBox({required int startIndex, BmffBox? parent}) {
     final factory = BoxFactory();
     return factory.makeBox(this, startIndex, parent: parent);
+  }
+
+  static List<BmffBox> _allBox(BmffContext context) {
+    final result = <BmffBox>[];
+    final bmff = Bmff(context);
+    final allBox = bmff.decodeBox();
+    for (final box in allBox) {
+      result.add(box);
+      result.addAll(_decodeBox(box));
+    }
+    return result;
+  }
+
+  static Iterable<BmffBox> _decodeBox(BmffBox box) {
+    final result = <BmffBox>[];
+    for (final child in box.childBoxes) {
+      result.add(child);
+      result.addAll(_decodeBox(child));
+    }
+    return result;
   }
 }
 

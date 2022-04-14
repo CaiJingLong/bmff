@@ -14,6 +14,15 @@ Future<void> main(List<String> args) async {
   _showFileBoxInfo(mp4File);
 }
 
+// ignore: unused_element
+void _showDecodeBox(File mp4file) {
+  final context = BmffIoContext(mp4file);
+  final allBox = context.allBox;
+  for (final box in allBox) {
+    print(box);
+  }
+}
+
 Future<File> getNetworkMp4Url() async {
   final path = 'video123/mp4/720/big_buck_bunny_720p_1mb.mp4';
   final file = File('${Directory.systemTemp.path}/$path');
@@ -45,8 +54,8 @@ void _showFileBoxInfo(File file) {
 
 void showBox(BmffBox box, int level) {
   if (level != 0) {
-    final space = '｜---' * (level - 1);
-    print('$space|-- ${box.type} (${box.size})');
+    final space = '｜    ' * (level - 1);
+    print('$space|---- ${box.type} (${box.size})');
   } else {
     print('${box.type} (${box.size})');
   }
