@@ -1,6 +1,10 @@
 import 'dart:io';
 
-import 'bmff.dart';
+import 'package:bmff/bmff.dart';
+
+Bmff createBmffFromFile(String path) {
+  return BmffIoContext(File(path)).bmff;
+}
 
 /// {@template bmff.BmffIoContext}
 ///

@@ -9,7 +9,7 @@ import 'package:bmff/bmff.dart';
 /// Some boxes are not defined in the standard.
 ///
 /// {@endtemplate}
-class BmffBox with BoxContainer {
+class BmffBox extends BoxContainer {
   /// {@macro bmff.bmff_box}
   BmffBox({
     required this.context,
@@ -85,7 +85,7 @@ class BmffBox with BoxContainer {
 
   /// Some boxes have some extended data.
   /// For example, meta of heic have 4 bytes extended data.
-  int extendInfoSize;
+  final int extendInfoSize;
 
   /// The child boxes of the box.
   @override
@@ -117,6 +117,7 @@ class BmffBox with BoxContainer {
     return endOffset - startOffset - headerSize - extendInfoSize;
   }
 
+  /// The start offset of the box data.
   late int dataStartOffset = _dataStartOffset();
 
   int _dataStartOffset() {

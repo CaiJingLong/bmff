@@ -1,4 +1,10 @@
+import 'dart:collection';
+
 import 'package:bmff/bmff.dart';
+
+import 'stub.dart'
+    if (dart.library.io) 'io_impl.dart'
+    if (dart.library.html) 'web_impl.dart';
 
 ///
 /// The BMFF library.
@@ -18,9 +24,17 @@ import 'package:bmff/bmff.dart';
 /// ```
 ///
 /// {@endtemplate}
-class Bmff with BoxContainer {
+class Bmff extends BoxContainer {
   /// {@macro bmff.bmff_example}
   Bmff(this.context);
+
+  factory Bmff.file(String path) {
+    return createBmffFromFile(path);
+  }
+
+  factory Bmff.memory(List<int> bytes) {
+    return Bmff(BmffMemoryContext(bytes));
+  }
 
   /// The context of the BMFF file.
   ///
@@ -63,14 +77,27 @@ class Bmff with BoxContainer {
 /// Container of [BmffBox].
 ///
 /// use [childBoxes] to get the [List] of [BmffBox].
-mixin BoxContainer {
+abstract class BoxContainer extends UnmodifiableMapBase<String, BmffBox> {
   /// The [BmffBox]s.
   List<BmffBox> get childBoxes;
 
-  /// Get the [BmffBox] by [type].
-  BmffBox operator [](String type) {
-    return childBoxes.firstWhere((element) => element.type == type);
+  @override
+  late int length = childBoxes.length;
+
+  @override
+  BmffBox operator [](Object? key) {
+    if (key is String) {
+      for (final box in childBoxes) {
+        if (box.type == key) {
+          return box;
+        }
+      }
+    }
+    throw NotFoundException('not found $key');
   }
+
+  @override
+  Iterable<String> get keys => childBoxes.map((e) => e.type);
 }
 
 /// Convert [bytes] to display text or number.
@@ -98,5 +125,16 @@ extension BmffListExtension on List<int> {
       result = result << 8 | this[i];
     }
     return result;
+  }
+}
+
+class NotFoundException implements Exception {
+  NotFoundException(this.message);
+
+  final String message;
+
+  @override
+  String toString() {
+    return message;
   }
 }

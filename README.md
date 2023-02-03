@@ -11,14 +11,13 @@ dependencies:
 
 ```dart
 import 'package:bmff/bmff.dart';
-
-// if you want to read a dart.io.File
-import 'package:bmff/bmff_io.dart';
 ```
 
 ## Example
 
-See [example](https://github.com/CaiJingLong/bmff/blob/main/example/bin/bmff_example.dart).
+### All examples
+
+See [example](https://github.com/CaiJingLong/bmff/blob/main/example).
 
 ## Other resources
 

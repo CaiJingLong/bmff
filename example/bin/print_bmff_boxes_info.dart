@@ -1,7 +1,6 @@
 import 'dart:io';
 
 import 'package:bmff/bmff.dart';
-import 'package:bmff/bmff_io.dart';
 import 'package:http/http.dart';
 import 'package:archive/archive_io.dart';
 
@@ -53,10 +52,9 @@ Future<File> getLocalMp4() async {
 }
 
 void _showFileBoxInfo(File file) {
-  print('Show file: ${file.absolute.path} bmff box info.');
-  final context = BmffIoContext(file);
+  print('show file: ${file.absolute.path} box info: ');
 
-  final bmff = Bmff(context);
+  final bmff = Bmff.file(file.absolute.path);
 
   final boxes = bmff.decodeBox();
 
