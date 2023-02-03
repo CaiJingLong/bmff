@@ -36,11 +36,15 @@ class BmffBox with BoxContainer {
   final int extendedSize;
 
   /// Whether the box is full box.
-  bool get isFullBox => extendedSize != 0;
+  bool get isFullBox => size == 1;
 
   /// The box real size;
   int get realSize {
-    return endOffset - startOffset;
+    if (isFullBox) {
+      return extendedSize;
+    } else {
+      return size;
+    }
   }
 
   /// The start offset of the box.

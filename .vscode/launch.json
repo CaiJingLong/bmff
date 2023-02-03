@@ -9,7 +9,7 @@
             "request": "launch",
             "type": "dart",
             "cwd": "example",
-            "program": "bin/show_bmff_boxes.dart",
+            "program": "bin/print_bmff_boxes_info.dart",
         },
     ]
 }

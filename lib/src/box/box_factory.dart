@@ -21,8 +21,8 @@ class BoxFactory {
     final size =
         context.getRangeData(startIndex, startIndex + 4).toBigEndian(4);
     final typeData = context.getRangeData(startIndex + 4, startIndex + 8);
-    print('type: ${typeData.toAsciiString()}');
-    print('size: $size');
+    // print('type: ${typeData.toAsciiString()}');
+    // print('size: $size');
     _checkType(typeData);
 
     final type = typeData.toAsciiString();

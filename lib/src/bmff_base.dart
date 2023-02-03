@@ -44,7 +44,7 @@ class Bmff with BoxContainer {
     while (startIndex < length) {
       final box = context.makeBox(startIndex: startIndex, parent: null);
       context.boxes.add(box);
-      startIndex += box.size;
+      startIndex += box.realSize;
     }
 
     final firstBox = context.boxes.first;

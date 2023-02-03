@@ -16,15 +16,6 @@ Future<void> main(List<String> args) async {
   _showFileBoxInfo(mp4File);
 }
 
-// ignore: unused_element
-void _showDecodeBox(File mp4file) {
-  final context = BmffIoContext(mp4file);
-  final allBox = context.allBox;
-  for (final box in allBox) {
-    print(box);
-  }
-}
-
 Future<File> getNetworkMp4Url() async {
   final path = 'preview/preview1.mp4';
   final tmpPath = 'build';
