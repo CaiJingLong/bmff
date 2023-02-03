@@ -7,7 +7,6 @@ import 'package:bmff/bmff_io.dart';
 void main(List<String> args) {
   final file = File('assets/compare_still_1.heic');
   final bmff = BmffIoContext(file).bmff;
-  // final boxes = bmff.decodeBox();
 
   final buffer = bmff['meta']['iprp']['ipco']['ispe'].getByteBuffer();
 

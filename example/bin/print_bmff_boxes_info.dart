@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:bmff/bmff.dart';
 import 'package:bmff/bmff_io.dart';
 import 'package:http/http.dart';
+import 'package:archive/archive_io.dart';
 
 Future<void> main(List<String> args) async {
   final file = File('assets/compare_still_1.heic');
@@ -10,8 +11,8 @@ Future<void> main(List<String> args) async {
 
   print('-' * 60);
 
-  // final mp4File = await getNetworkMp4Url();
-  final mp4File = await getLocalMp4();
+  final mp4File = await getNetworkMp4Url();
+  // final mp4File = await getLocalMp4();
   _showFileBoxInfo(mp4File);
 }
 
@@ -25,17 +26,22 @@ void _showDecodeBox(File mp4file) {
 }
 
 Future<File> getNetworkMp4Url() async {
-  final path = 'video123/mp4/720/big_buck_bunny_720p_1mb.mp4';
-  final file = File('${Directory.systemTemp.path}/$path');
+  final path = 'preview/preview1.mp4';
+  final tmpPath = 'build';
+  final file = File('$tmpPath/$path');
   if (file.existsSync()) {
     return file;
   } else if (!file.parent.existsSync()) {
     file.parent.createSync(recursive: true);
   }
-  final url = 'https://www.sample-videos.com/$path';
+
+  final url =
+      'https://cdn.jsdelivr.net/gh/ExampleAssets/ExampleAsset@master/preview1_mp4.tar';
   try {
     final response = await get(Uri.parse(url));
-    await file.writeAsBytes(response.bodyBytes);
+    final tmpFile = File('$tmpPath/preview1_mp4.tar');
+    tmpFile.writeAsBytesSync(response.bodyBytes);
+    await extractFileToDisk(tmpFile.path, file.parent.absolute.path);
     print('Downloaded file: ${file.path} successfully.');
     print('The file size is ${file.lengthSync()} bytes.');
     return file;

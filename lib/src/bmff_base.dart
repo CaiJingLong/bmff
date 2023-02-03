@@ -18,7 +18,7 @@ import 'package:bmff/bmff.dart';
 /// ```
 ///
 /// {@endtemplate}
-class Bmff {
+class Bmff with BoxContainer {
   /// {@macro bmff.bmff_example}
   Bmff(this.context);
 
@@ -56,24 +56,25 @@ class Bmff {
     return context.boxes;
   }
 
-  late List<BmffBox> allBox = decodeBox();
+  @override
+  late List<BmffBox> childBoxes = decodeBox();
+}
 
+/// Container of [BmffBox].
+///
+/// use [childBoxes] to get the [List] of [BmffBox].
+mixin BoxContainer {
+  /// The [BmffBox]s.
+  List<BmffBox> get childBoxes;
+
+  /// Get the [BmffBox] by [type].
   BmffBox operator [](String type) {
-    return allBox.firstWhere((element) => element.type == type);
+    return childBoxes.firstWhere((element) => element.type == type);
   }
 }
 
 /// Convert [bytes] to display text or number.
 extension BmffListExtension on List<int> {
-  int toBigEndian() {
-    return this[0] << 24 | this[1] << 16 | this[2] << 8 | this[3];
-  }
-
-  // ignore: unused_element
-  int toLittleEndian() {
-    return this[3] << 24 | this[2] << 16 | this[1] << 8 | this[0];
-  }
-
   // ignore: unused_element
   String toHexString() {
     return map((i) => i.toRadixString(16).padLeft(2, '0')).join();
@@ -81,5 +82,21 @@ extension BmffListExtension on List<int> {
 
   String toAsciiString() {
     return map((i) => String.fromCharCode(i)).join();
+  }
+
+  int toBigEndian(int byteCount) {
+    var result = 0;
+    for (var i = 0; i < byteCount; i++) {
+      result = result << 8 | this[i];
+    }
+    return result;
+  }
+
+  int toLittleEndian(int byteCount) {
+    var result = 0;
+    for (var i = byteCount - 1; i >= 0; i--) {
+      result = result << 8 | this[i];
+    }
+    return result;
   }
 }

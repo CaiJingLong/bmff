@@ -9,7 +9,7 @@ import 'package:bmff/bmff.dart';
 /// Some boxes are not defined in the standard.
 ///
 /// {@endtemplate}
-class BmffBox {
+class BmffBox with BoxContainer {
   /// {@macro bmff.bmff_box}
   BmffBox({
     required this.context,
@@ -84,11 +84,8 @@ class BmffBox {
   int extendInfoSize;
 
   /// The child boxes of the box.
+  @override
   late List<BmffBox> childBoxes = _decodeChildBoxes();
-
-  BmffBox operator [](String type) {
-    return childBoxes.firstWhere((element) => element.type == type);
-  }
 
   /// See [childBoxes].
   List<BmffBox> _decodeChildBoxes() {

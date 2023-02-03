@@ -7,6 +7,7 @@ environment:
   sdk: ">=2.16.1 <3.0.0"
 
 dependencies:
+  archive: ^3.3.6
   bmff:
     path: ../
   http: ^0.13.4
