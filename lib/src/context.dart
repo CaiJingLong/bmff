@@ -1,5 +1,4 @@
 import 'package:bmff/bmff.dart';
-import 'package:bmff/bmff.dart';
 import 'package:bmff/src/box/box_factory.dart';
 
 /// {@template bmff.bmff_context}
