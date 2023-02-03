@@ -20,7 +20,7 @@ import 'package:bmff/bmff.dart';
 /// {@endtemplate}
 class Bmff {
   /// {@macro bmff.bmff_example}
-  const Bmff(this.context);
+  Bmff(this.context);
 
   /// The context of the BMFF file.
   ///
@@ -54,6 +54,12 @@ class Bmff {
     }
 
     return context.boxes;
+  }
+
+  late List<BmffBox> allBox = decodeBox();
+
+  BmffBox operator [](String type) {
+    return allBox.firstWhere((element) => element.type == type);
   }
 }
 

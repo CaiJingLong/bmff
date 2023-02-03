@@ -1,4 +1,5 @@
 import 'package:bmff/bmff.dart';
+import 'package:bmff/bmff.dart';
 import 'package:bmff/src/box/box_factory.dart';
 
 /// {@template bmff.bmff_context}
@@ -63,6 +64,8 @@ abstract class BmffContext {
     }
     return result;
   }
+
+  late Bmff bmff = Bmff(this);
 }
 
 /// {@template bmff.BmffMemoryContext}

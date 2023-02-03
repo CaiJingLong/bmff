@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:bmff/bmff.dart';
 
 /// {@template bmff.bmff_box}
@@ -84,6 +86,10 @@ class BmffBox {
   /// The child boxes of the box.
   late List<BmffBox> childBoxes = _decodeChildBoxes();
 
+  BmffBox operator [](String type) {
+    return childBoxes.firstWhere((element) => element.type == type);
+  }
+
   /// See [childBoxes].
   List<BmffBox> _decodeChildBoxes() {
     try {
@@ -103,6 +109,30 @@ class BmffBox {
       // it is regarded as no sub box.
       return [];
     }
+  }
+
+  /// The data size of the box.
+  int get dataSize {
+    return endOffset - startOffset - headerSize - extendInfoSize;
+  }
+
+  late int dataStartOffset = _dataStartOffset();
+
+  int _dataStartOffset() {
+    return startOffset + headerSize + extendInfoSize;
+  }
+
+  /// Get data of the box.
+  ByteBuffer getByteBuffer() {
+    final list = context.getRangeData(dataStartOffset, endOffset);
+    return Uint8List.fromList(list).buffer;
+  }
+
+  /// Get the box data from the start offset to the end offset.
+  ///
+  /// Ignore the header and extended data.
+  List<int> getRangeData(int start, int end) {
+    return context.getRangeData(dataStartOffset + start, dataStartOffset + end);
   }
 
   @override
