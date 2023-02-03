@@ -5,12 +5,13 @@ import 'package:bmff/bmff_io.dart';
 import 'package:http/http.dart';
 
 Future<void> main(List<String> args) async {
-  // final file = File('assets/compare_still_1.heic');
-  // _showFileBoxInfo(file);
+  final file = File('assets/compare_still_1.heic');
+  _showFileBoxInfo(file);
 
-  // print('-' * 60);
+  print('-' * 60);
 
-  final mp4File = await getNetworkMp4Url();
+  // final mp4File = await getNetworkMp4Url();
+  final mp4File = await getLocalMp4();
   _showFileBoxInfo(mp4File);
 }
 
@@ -32,11 +33,26 @@ Future<File> getNetworkMp4Url() async {
     file.parent.createSync(recursive: true);
   }
   final url = 'https://www.sample-videos.com/$path';
-  final response = await get(Uri.parse(url));
-  await file.writeAsBytes(response.bodyBytes);
-  print('Downloaded file: ${file.path} successfully.');
-  print('The file size is ${file.lengthSync()} bytes.');
-  return file;
+  try {
+    final response = await get(Uri.parse(url));
+    await file.writeAsBytes(response.bodyBytes);
+    print('Downloaded file: ${file.path} successfully.');
+    print('The file size is ${file.lengthSync()} bytes.');
+    return file;
+  } on Exception catch (e) {
+    print('Failed to download file: $e, url: $url');
+    rethrow;
+  }
+}
+
+Future<File> getLocalMp4() async {
+  final file = File(
+      '/Users/jinglongcai/Documents/下载-视频/田馥甄 Hebe Tien《懸日 Let It…》Official Music Video.mp4');
+  if (file.existsSync()) {
+    return file;
+  } else {
+    throw Exception('File not found: ${file.path}');
+  }
 }
 
 void _showFileBoxInfo(File file) {
@@ -53,11 +69,14 @@ void _showFileBoxInfo(File file) {
 }
 
 void showBox(BmffBox box, int level) {
+  final isFullBox = box.isFullBox;
+  final fullBoxSuffix = isFullBox ? '(fullbox)' : '';
+
   if (level != 0) {
     final space = '｜    ' * (level - 1);
-    print('$space|---- ${box.type} (${box.size})');
+    print('$space|---- ${box.type} (${box.size}) $fullBoxSuffix');
   } else {
-    print('${box.type} (${box.size})');
+    print('${box.type} (${box.size}) $fullBoxSuffix');
   }
   for (final child in box.childBoxes) {
     showBox(child, level + 1);

@@ -32,10 +32,16 @@ abstract class BmffContext {
   /// Release the context.
   void close();
 
+  /// {@macro bmff.box_factory}
+  final _boxFactory = BoxFactory();
+
+  void resgiterBox(BmffBox box) {
+    boxes.add(box);
+  }
+
   /// Decode [BmffBox] from [startIndex].
   BmffBox makeBox({required int startIndex, BmffBox? parent}) {
-    final factory = BoxFactory();
-    return factory.makeBox(this, startIndex, parent: parent);
+    return _boxFactory.makeBox(this, startIndex, parent: parent);
   }
 
   static List<BmffBox> _allBox(BmffContext context) {
