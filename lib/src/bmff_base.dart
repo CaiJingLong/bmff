@@ -10,29 +10,66 @@ import 'stub.dart'
 ///
 /// The BMFF library.
 ///
+/// Example:
+///
 /// {@template bmff.bmff_example}
 ///
 /// ```dart
 /// import 'package:bmff/bmff.dart';
-/// import 'package:bmff/bmff_io.dart';
 ///
 /// void main() {
-///   final file = File('assets/compare_still_1.heic');
-///   final context = BmffIoContext(file); // or BmffMemoryContext(bytes);
-///   final bmff = Bmff(context);
-///   final box = bmff.decodeBox();
-/// }
-/// ```
+///   final assetPath = 'assets/compare_still_1.heic';
+///   final bmff =
+///       Bmff.file(assetPath); // The path is file path, not flutter asset path.
 ///
+///   final boxes = bmff.childBoxes;
+///   for (final box in boxes) {
+///     print(box);
+///   }
+///
+///   showFtyp(bmff);
+/// }
+///
+/// void useByteListSource(List<int> bytes) {
+///   final bmff = Bmff.memory(bytes);
+///   final boxes = bmff.childBoxes;
+///   for (final box in boxes) {
+///     print(box);
+///   }
+/// }
+///
+/// void showFtyp(Bmff bmff) {
+///   final typeBox = bmff.typeBox;
+///   final type = typeBox.type;
+///
+///   final majorBrand = typeBox.majorBrand;
+///   final minorVersion = typeBox.minorVersion;
+///   final compatibleBrands = typeBox.compatibleBrands;
+///
+///   print('type: $type');
+///   print('majorBrand: $majorBrand');
+///   print('minorVersion: $minorVersion');
+///   print('compatibleBrands: $compatibleBrands');
+/// }
+///
+/// ```
 /// {@endtemplate}
 class Bmff extends BoxContainer {
   /// {@macro bmff.bmff_example}
   Bmff(this.context);
 
+  /// Create [Bmff] from file path.
+  ///
+  /// {@macro bmff.bmff_for_web}
+  ///
+  /// {@macro bmff.bmff_example}
   factory Bmff.file(String path) {
     return createBmffFromFile(path);
   }
 
+  /// Create [Bmff] from [bytes].
+  ///
+  /// {@macro bmff.bmff_example}
   factory Bmff.memory(List<int> bytes) {
     return Bmff(BmffMemoryContext(bytes));
   }
@@ -41,6 +78,12 @@ class Bmff extends BoxContainer {
   ///
   /// {@macro bmff.bmff_context}
   final BmffContext context;
+
+  /// Type box
+  FtypBox get typeBox => this['ftyp'] as FtypBox;
+
+  /// Type of the BMFF file.
+  String get type => typeBox.type;
 
   /// Decode file to [BmffBox]s.
   ///
@@ -64,7 +107,7 @@ class Bmff extends BoxContainer {
 
     final firstBox = context.boxes.first;
 
-    if (firstBox is FtypeBox) {
+    if (firstBox is FtypBox) {
       context.ftypeBox = firstBox;
     }
 
@@ -94,7 +137,7 @@ abstract class BoxContainer extends UnmodifiableMapBase<String, BmffBox> {
         }
       }
     }
-    throw NotFoundException('not found $key');
+    throw NotFoundException('Not found BmffBox with $key.');
   }
 
   @override
@@ -104,14 +147,17 @@ abstract class BoxContainer extends UnmodifiableMapBase<String, BmffBox> {
 /// Convert [bytes] to display text or number.
 extension BmffListExtension on List<int> {
   // ignore: unused_element
+  /// Convert [bytes] to [String]. and display as hex.
   String toHexString() {
     return map((i) => i.toRadixString(16).padLeft(2, '0')).join();
   }
 
+  /// Convert [bytes] to [String]. and display as ascii.
   String toAsciiString() {
     return map((i) => String.fromCharCode(i)).join();
   }
 
+  /// Convert [bytes] to [int] with big endian. The number is unsigned.
   int toBigEndian([int? byteCount]) {
     byteCount ??= length;
 
@@ -122,6 +168,7 @@ extension BmffListExtension on List<int> {
     return result;
   }
 
+  /// Convert [bytes] to [int] with little endian. The number is unsigned.
   int toLittleEndian([int? byteCount]) {
     byteCount ??= length;
 
@@ -132,6 +179,11 @@ extension BmffListExtension on List<int> {
     return result;
   }
 
+  /// Convert [bytes] to [int]. The number is unsigned.
+  ///
+  /// The [endian] is the endian of the [bytes].
+  ///
+  /// The [count] is the number of bytes to convert.
   int toUint(int count, Endian endian) {
     if (endian == Endian.big) {
       return toBigEndian(count);
@@ -141,9 +193,12 @@ extension BmffListExtension on List<int> {
   }
 }
 
+/// Not found exception.
 class NotFoundException implements Exception {
+  /// Create [NotFoundException] with [message].
   NotFoundException(this.message);
 
+  /// The message of the exception.
   final String message;
 
   @override

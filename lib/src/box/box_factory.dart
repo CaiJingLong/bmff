@@ -55,7 +55,7 @@ class BoxFactory {
     }
 
     if (type == 'ftyp') {
-      return FtypeBox(
+      return FtypBox(
         context: context,
         size: size,
         type: type,

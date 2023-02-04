@@ -18,7 +18,7 @@ abstract class BmffContext {
   late List<BmffBox> allBox = _allBox(this);
 
   /// The FTYP box of the context.
-  late FtypeBox ftypeBox;
+  late FtypBox ftypeBox;
 
   /// The length of the context.
   int get length;

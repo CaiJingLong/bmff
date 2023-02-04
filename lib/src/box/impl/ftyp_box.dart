@@ -9,9 +9,9 @@ import 'package:bmff/bmff.dart';
 /// Some file type have more than one compatible versions, it may be empty.
 ///
 /// {@endtemplate}
-class FtypeBox extends BmffBox {
+class FtypBox extends BmffBox {
   /// {@macro bmff.ftyp_box}
-  FtypeBox({
+  FtypBox({
     required BmffContext context,
     required int size,
     required String type,
@@ -26,21 +26,21 @@ class FtypeBox extends BmffBox {
         );
 
   /// Major brand.
-  late String brandVersion =
+  late String majorBrand =
       context.getRangeData(startOffset + 8, startOffset + 12).toAsciiString();
 
   /// Minor version.
-  late String majorVersion =
+  late String minorVersion =
       context.getRangeData(startOffset + 12, startOffset + 16).toAsciiString();
 
   /// Compatible brands. it may be empty.
-  late List<String> compatibleVersions = getCompatibleVersions();
+  late List<String> compatibleBrands = _getCompatibleVersions();
 
-  /// See [compatibleVersions].
-  List<String> getCompatibleVersions() {
+  /// See [compatibleBrands].
+  List<String> _getCompatibleVersions() {
     final compatibleVersions = <String>[];
     var index = startOffset + 16;
-    while (index < startOffset + size) {
+    while (index < realSize) {
       compatibleVersions
           .add(context.getRangeData(index, index + 4).toAsciiString());
       index += 4;
