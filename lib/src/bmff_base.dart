@@ -1,4 +1,5 @@
 import 'dart:collection';
+import 'dart:typed_data';
 
 import 'package:bmff/bmff.dart';
 
@@ -125,6 +126,14 @@ extension BmffListExtension on List<int> {
       result = result << 8 | this[i];
     }
     return result;
+  }
+
+  int toUint(int count, Endian endian) {
+    if (endian == Endian.big) {
+      return toBigEndian(count);
+    } else {
+      return toLittleEndian(count);
+    }
   }
 }
 
