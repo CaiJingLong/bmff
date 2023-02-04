@@ -70,9 +70,11 @@ See [example](https://github.com/CaiJingLong/bmff/blob/main/example).
 ## Other resources
 
 [ISO Base Media File Format (BMFF)][isobmff]
+[The project wiki][wiki]
 
 ## LICENSE
 
 [BSD 3-Clause License](https://github.com/CaiJingLong/bmff/blob/main/LICENSE)
 
 [isobmff]: https://mpeg.chiariglione.org/standards/mpeg-4/iso-base-media-file-format
+[wiki]: https://github.com/CaiJingLong/bmff/wiki
