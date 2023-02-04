@@ -112,7 +112,9 @@ extension BmffListExtension on List<int> {
     return map((i) => String.fromCharCode(i)).join();
   }
 
-  int toBigEndian(int byteCount) {
+  int toBigEndian([int? byteCount]) {
+    byteCount ??= length;
+
     var result = 0;
     for (var i = 0; i < byteCount; i++) {
       result = result << 8 | this[i];
@@ -120,7 +122,9 @@ extension BmffListExtension on List<int> {
     return result;
   }
 
-  int toLittleEndian(int byteCount) {
+  int toLittleEndian([int? byteCount]) {
+    byteCount ??= length;
+
     var result = 0;
     for (var i = byteCount - 1; i >= 0; i--) {
       result = result << 8 | this[i];

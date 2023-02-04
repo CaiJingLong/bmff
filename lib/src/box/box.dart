@@ -137,6 +137,14 @@ class BmffBox extends BoxContainer {
     return context.getRangeData(dataStartOffset + start, dataStartOffset + end);
   }
 
+  /// Get the box data from the [start] offset and [length].
+  ///
+  /// Ignore the header and extended data.
+  List<int> getRangeDataByLength(int start, int length) {
+    return context.getRangeData(
+        dataStartOffset + start, dataStartOffset + start + length);
+  }
+
   @override
   String toString() {
     final realSize = extendedSize != 0 ? extendedSize : size;
