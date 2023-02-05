@@ -2,6 +2,8 @@ import 'dart:typed_data';
 
 import 'package:bmff/bmff.dart';
 
+import 'full_box_type.dart';
+
 /// {@template bmff.bmff_box}
 ///
 /// A base class for all BMFF boxes.
@@ -17,7 +19,6 @@ class BmffBox extends BoxContainer {
     required this.type,
     required this.extendedSize,
     required this.startOffset,
-    this.extendInfoSize = 0,
   });
 
   /// {@macro bmff.bmff_context}
@@ -32,16 +33,23 @@ class BmffBox extends BoxContainer {
   /// The type of the box.
   final String type;
 
-  /// If the box is full box, it contains the extended size. Otherwise, it is 0.
+  /// If the box is large box, it contains the extended size. Otherwise, it is 0.
   final int extendedSize;
 
-  /// Whether the box is full box.
-  bool get isFullBox => size == 1;
+  /// Whether the box is large box.
+  bool get isLargeBox => size == 1;
+
+  /// Whether the box is a full box.
+  bool get isFullBox {
+    return fullBoxType.contains(type);
+  }
 
   /// The box real size;
   int get realSize {
-    if (isFullBox) {
+    if (isLargeBox) {
       return extendedSize;
+    } else if (size == 0) {
+      return context.length - startOffset;
     } else {
       return size;
     }
@@ -56,10 +64,10 @@ class BmffBox extends BoxContainer {
   /// See [endOffset].
   int _getEndOffset() {
     if (size == 0) {
-      return startOffset + 8;
+      return context.length;
     }
     if (size == 1) {
-      // full box, read the extended size, from the next 8 bytes
+      // large box, read the extended size, from the next 8 bytes
       return startOffset + extendedSize;
     }
 
@@ -85,7 +93,7 @@ class BmffBox extends BoxContainer {
 
   /// Some boxes have some extended data.
   /// For example, meta of heic have 4 bytes extended data.
-  final int extendInfoSize;
+  int get extendInfoSize => isFullBox ? 4 : 0;
 
   /// The child boxes of the box.
   @override
@@ -147,8 +155,6 @@ class BmffBox extends BoxContainer {
 
   @override
   String toString() {
-    final realSize = extendedSize != 0 ? extendedSize : size;
-
     return '$type (len = $realSize)';
   }
 }

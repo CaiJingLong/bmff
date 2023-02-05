@@ -37,14 +37,16 @@ void _showFileBoxInfo(File file) {
 }
 
 void showBox(BmffBox box, int level) {
-  final isFullBox = box.isFullBox;
-  final fullBoxSuffix = isFullBox ? '(fullbox)' : '';
+  final largeBoxSuffix = box.isLargeBox ? ' (large box)' : '';
+  final fullBoxSuffix = box.isFullBox ? ' (full box)' : '';
+
+  final boxSuffix = largeBoxSuffix + fullBoxSuffix;
 
   if (level != 0) {
     final space = '｜    ' * (level - 1);
-    print('$space|---- ${box.type} (${box.size}) $fullBoxSuffix');
+    print('$space|---- ${box.type} (${box.realSize}) $boxSuffix');
   } else {
-    print('${box.type} (${box.size}) $fullBoxSuffix');
+    print('${box.type} (${box.realSize}) $boxSuffix');
   }
   for (final child in box.childBoxes) {
     showBox(child, level + 1);

@@ -64,19 +64,12 @@ class BoxFactory {
       );
     }
 
-    var extendInfoSize = 0;
-
-    if (type == 'meta') {
-      extendInfoSize = 4;
-    }
-
     return BmffBox(
       context: context,
       size: size,
       type: type,
       extendedSize: 0,
       startOffset: startIndex,
-      extendInfoSize: extendInfoSize,
     );
   }
 
