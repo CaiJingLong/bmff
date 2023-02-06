@@ -137,8 +137,15 @@ class AsyncBmffBox extends BmffBoxBase {
 
   Future<void> updateForceFullBox(bool? forceFullBox) async {
     super.forceFullBox = forceFullBox;
+    await _updateChildBoxes();
+  }
+
+  Future<void> _updateChildBoxes() async {
     childBoxes.clear();
     await init();
+    for (final child in childBoxes) {
+      await child._updateChildBoxes();
+    }
   }
 
   /// Get data of the box.
