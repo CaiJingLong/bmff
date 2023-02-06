@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 1.2.0
+
+- Support async context
+
 ## 1.1.0
 
 - old 'full box' to 'large box'
