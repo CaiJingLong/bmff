@@ -5,6 +5,10 @@ import 'dart:developer';
 import 'package:bmff/bmff.dart';
 
 void _checkType(List<int> typeData) {
+  typeData = typeData.where((element) => element != 0).toList();
+  if (typeData.isEmpty) {
+    throw Exception('Invalid box type, the type char list is empty');
+  }
   // type data must a-zA-Z0-9
   for (final value in typeData) {
     if (!((value >= 0x41 && value <= 0x5a) ||
@@ -157,8 +161,11 @@ class AsyncBoxFactory {
         .toBigEndian();
 
     final typeData =
-        (await context.getRangeData(startOffset + 4, startOffset + 8))
-            .toAsciiString();
+        (await context.getRangeData(startOffset + 4, startOffset + 8));
+
+    _checkType(typeData);
+
+    final type = typeData.toAsciiString();
 
     var realSize = size;
     if (size == 1) {
@@ -166,7 +173,7 @@ class AsyncBoxFactory {
           .toBigEndian();
     }
 
-    return _createBmffBox(typeData, size, context, startOffset, realSize);
+    return _createBmffBox(type, size, context, startOffset, realSize);
   }
 
   AsyncBmffBox _createBmffBox(
