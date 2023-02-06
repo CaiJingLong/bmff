@@ -162,6 +162,18 @@ class AsyncBmffBox extends BmffBoxBase {
         dataStartOffset + start, dataStartOffset + start + length);
   }
 
+  AsyncBmffBox operator [](Object? key) {
+    if (key is String) {
+      return childBoxes.firstWhere(
+        (element) => element.type == key,
+        orElse: () => throw NotFoundException(
+          'Not found BmffBox with $key.',
+        ),
+      );
+    }
+    throw NotFoundException('Not found BmffBox with $key.');
+  }
+
   @override
   String toString() {
     return '$type (len = $realSize, start = $startOffset, end = $endOffset)';

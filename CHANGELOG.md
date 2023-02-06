@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 1.3.0
+
+- Add `[]` method to `AsyncBmffBox`
+
 ## 1.2.0
 
 - Support async context
