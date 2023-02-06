@@ -111,3 +111,59 @@ class BmffBox extends BmffBoxBase {
     return '$type (len = $realSize, start = $startOffset, end = $endOffset)';
   }
 }
+
+class AsyncBmffBox extends BmffBoxBase {
+  AsyncBmffBox({
+    required this.context,
+    required int size,
+    required String type,
+    required int realSize,
+    required int startOffset,
+  }) : super(
+          size: size,
+          type: type,
+          realSize: realSize,
+          startOffset: startOffset,
+        );
+
+  final AsyncBmffContext context;
+
+  final List<AsyncBmffBox> childBoxes = [];
+
+  Future<void> init() async {
+    final children = await AsyncBoxFactory().decodeChildBoxes(this);
+    childBoxes.addAll(children);
+  }
+
+  Future<void> updateForceFullBox(bool? forceFullBox) async {
+    super.forceFullBox = forceFullBox;
+    childBoxes.clear();
+    await init();
+  }
+
+  /// Get data of the box.
+  Future<ByteBuffer> getByteBuffer() async {
+    final list = await context.getRangeData(dataStartOffset, endOffset);
+    return Uint8List.fromList(list).buffer;
+  }
+
+  /// Get the box data from the start offset to the end offset.
+  ///
+  /// Ignore the header and extended data.
+  Future<List<int>> getRangeData(int start, int end) {
+    return context.getRangeData(dataStartOffset + start, dataStartOffset + end);
+  }
+
+  /// Get the box data from the [start] offset and [length].
+  ///
+  /// Ignore the header and extended data.
+  Future<List<int>> getRangeDataByLength(int start, int length) {
+    return context.getRangeData(
+        dataStartOffset + start, dataStartOffset + start + length);
+  }
+
+  @override
+  String toString() {
+    return '$type (len = $realSize, start = $startOffset, end = $endOffset)';
+  }
+}
