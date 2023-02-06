@@ -69,11 +69,6 @@ class BmffBox extends BmffBoxBase {
     }
   }
 
-  /// The data size of the box.
-  int get dataSize {
-    return endOffset - startOffset - headerSize - extendInfoSize;
-  }
-
   /// Get data of the box.
   ByteBuffer getByteBuffer() {
     final list = context.getRangeData(dataStartOffset, endOffset);

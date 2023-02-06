@@ -1,4 +1,5 @@
 import 'dart:collection';
+import 'dart:typed_data';
 
 import 'package:bmff/bmff.dart';
 import 'package:bmff/src/box/box_factory.dart';
@@ -10,7 +11,7 @@ class AsyncBmff extends UnmodifiableMapBase<String, AsyncBmffBox> {
   final AsyncBmffContext context;
 
   Future<void> init() async {
-    _values = BoxFactory().decodeAsyncBoxes(this);
+    _values = await AsyncBoxFactory().decodeAsyncBoxes(this);
   }
 
   List<AsyncBmffBox> _values = [];
@@ -31,16 +32,16 @@ class AsyncBmff extends UnmodifiableMapBase<String, AsyncBmffBox> {
   }
 
   @override
-  Iterable<String> get keys => throw UnimplementedError();
+  Iterable<String> get keys => childBoxes.map((e) => e.type);
 }
 
 class AsyncBmffBox extends BmffBoxBase {
   AsyncBmffBox({
+    required this.context,
     required int size,
     required String type,
     required int realSize,
     required int startOffset,
-    required this.context,
   }) : super(
           size: size,
           type: type,
@@ -49,4 +50,31 @@ class AsyncBmffBox extends BmffBoxBase {
         );
 
   final AsyncBmffContext context;
+
+  final List<AsyncBmffBox> childBoxes = [];
+
+  void addChild(AsyncBmffBox box) {
+    childBoxes.add(box);
+  }
+
+  /// Get data of the box.
+  Future<ByteBuffer> getByteBuffer() async {
+    final list = await context.getRangeData(dataStartOffset, endOffset);
+    return Uint8List.fromList(list).buffer;
+  }
+
+  /// Get the box data from the start offset to the end offset.
+  ///
+  /// Ignore the header and extended data.
+  Future<List<int>> getRangeData(int start, int end) {
+    return context.getRangeData(dataStartOffset + start, dataStartOffset + end);
+  }
+
+  /// Get the box data from the [start] offset and [length].
+  ///
+  /// Ignore the header and extended data.
+  Future<List<int>> getRangeDataByLength(int start, int length) {
+    return context.getRangeData(
+        dataStartOffset + start, dataStartOffset + start + length);
+  }
 }

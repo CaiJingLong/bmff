@@ -89,6 +89,13 @@ class MemoryAsyncBmffContext extends AsyncBmffContext {
   final LengthGetter lengthAsyncGetter;
   final RangeDataGetter rangeDataGetter;
 
+  factory MemoryAsyncBmffContext.memory(List<int> bytes) {
+    return MemoryAsyncBmffContext(
+      () async => bytes.length,
+      (start, end) async => bytes.sublist(start, end),
+    );
+  }
+
   @override
   Future<int> lengthAsync() {
     return lengthAsyncGetter();

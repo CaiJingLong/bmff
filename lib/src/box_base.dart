@@ -54,4 +54,9 @@ class BmffBoxBase {
   /// Some boxes have some extended data.
   /// For example, meta of heic have 4 bytes extended data.
   int get extendInfoSize => isFullBox ? 4 : 0;
+
+  /// The data size of the box.
+  int get dataSize {
+    return endOffset - startOffset - headerSize - extendInfoSize;
+  }
 }

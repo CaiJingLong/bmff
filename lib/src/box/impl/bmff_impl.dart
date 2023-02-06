@@ -42,20 +42,3 @@ class ContextBmffImpl extends Bmff {
   @override
   List<BmffBox> get childBoxes => decodeBox();
 }
-
-class AsyncBmffImpl extends Bmff {
-  AsyncBmffImpl(this.context);
-
-  final AsyncBmffContext context;
-
-  Future<void> init() async {
-    _boxes.clear();
-    final factory = BoxFactory();
-    // factory.createBmffByAsync(context);
-  }
-
-  List<BmffBox> _boxes = [];
-
-  @override
-  List<BmffBox> get childBoxes => throw UnimplementedError();
-}
