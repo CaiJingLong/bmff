@@ -1,4 +1,5 @@
 import 'package:bmff/bmff.dart';
+import 'package:bmff/src/box/box_factory.dart';
 
 class ContextBmffImpl extends Bmff {
   /// {@macro bmff.bmff_example}
@@ -9,6 +10,11 @@ class ContextBmffImpl extends Bmff {
   /// {@macro bmff.bmff_context}
   final BmffContext context;
 
+  /// The FTYP box of the context.
+  late FtypBox ftypeBox;
+
+  final _valueList = <BmffBox>[];
+
   /// Decode file to [BmffBox]s.
   ///
   /// The method will add the [BmffBox]s to the [BmffContext.boxes].
@@ -16,26 +22,28 @@ class ContextBmffImpl extends Bmff {
   /// The box:
   /// {@macro bmff.bmff_box}
   List<BmffBox> decodeBox() {
-    context.boxes.clear();
+    _valueList.clear();
 
     final length = context.length;
 
     // decode the data
     var startIndex = 0;
 
+    final factory = BoxFactory();
+
     while (startIndex < length) {
-      final box = context.makeBox(startIndex: startIndex, parent: null);
-      context.boxes.add(box);
+      final box = factory.makeBox(context, startIndex);
+      _valueList.add(box);
       startIndex += box.realSize;
     }
 
-    final firstBox = context.boxes.first;
+    final firstBox = _valueList.first;
 
     if (firstBox is FtypBox) {
-      context.ftypeBox = firstBox;
+      ftypeBox = firstBox;
     }
 
-    return context.boxes;
+    return _valueList;
   }
 
   @override

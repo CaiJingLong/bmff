@@ -23,20 +23,26 @@ class BmffBoxBase {
   /// Whether the box is large box.
   bool get isLargeBox => size == 1;
 
+  bool? forceFullBox;
+
   /// Whether the box is a full box.
   bool get isFullBox {
-    return fullBoxType.contains(type);
+    if (forceFullBox != null) {
+      return forceFullBox!;
+    }
+    // return fullBoxType.contains(type);
+    return simpleTypes.contains(type);
   }
 
   /// The end offset of the box.
-  late int endOffset = _getEndOffset();
+  int get endOffset => _getEndOffset();
 
   /// See [endOffset].
   int _getEndOffset() {
     return startOffset + realSize;
   }
 
-  late int dataStartOffset = startOffset + headerSize + extendInfoSize;
+  int get dataStartOffset => startOffset + headerSize + extendInfoSize;
 
   /// The header size of the box.
   int get headerSize {

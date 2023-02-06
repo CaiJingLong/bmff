@@ -10,8 +10,9 @@ void _checkType(List<int> typeData) {
     if (!((value >= 0x41 && value <= 0x5a) ||
         (value >= 0x61 && value <= 0x7a) ||
         (value >= 0x30 && value <= 0x39))) {
+      final hex = typeData.map((e) => e.toRadixString(16)).join(' ');
       final errorLog =
-          'Invalid box type, the type char list is ${ascii.decode(typeData)}';
+          'Invalid box type, the type char list is ${ascii.decode(typeData)}, hex: $hex';
       log(errorLog);
       throw Exception(errorLog);
     }
@@ -69,8 +70,10 @@ class BoxFactory {
       );
     }
 
-    if (size < 8) {
-      throw Exception('Invalid size');
+    if (size < 8 && size != 1) {
+      final paramLog =
+          'size: $size, type: $type, startIndex: $startIndex, realSize: $realSize';
+      throw Exception('Invalid size, size must be greater than 8, $paramLog');
     }
 
     if (type == 'ftyp') {
@@ -99,6 +102,10 @@ class AsyncBoxFactory {
 
     await bmff.init();
 
+    for (final child in bmff.childBoxes) {
+      await child.init();
+    }
+
     return bmff;
   }
 
@@ -118,6 +125,28 @@ class AsyncBoxFactory {
       return boxes;
     } catch (e) {
       print(e);
+      return [];
+    }
+  }
+
+  Future<List<AsyncBmffBox>> decodeChildBoxes(AsyncBmffBox parent) async {
+    final context = parent.context;
+    try {
+      final boxes = <AsyncBmffBox>[];
+
+      var startOffset = parent.dataStartOffset;
+
+      while (startOffset < parent.endOffset) {
+        final box = await _makeBox(context, startOffset);
+        if (box.endOffset > parent.endOffset) {
+          throw Exception('Invalid box, end offset is larger than parent');
+        }
+        boxes.add(box);
+        startOffset += box.realSize;
+      }
+
+      return boxes;
+    } catch (e) {
       return [];
     }
   }
@@ -147,6 +176,13 @@ class AsyncBoxFactory {
     int startOffset,
     int realSize,
   ) {
+    // print('------------------------------------');
+    // print('create box:');
+    // print('type: $type');
+    // print('size: $size');
+    // print('realSize: $realSize');
+    // print('startOffset: $startOffset');
+
     if (size == 0) {
       return AsyncBmffBox(
         context: context,
@@ -157,8 +193,10 @@ class AsyncBoxFactory {
       );
     }
 
-    if (size < 8) {
-      throw Exception('Invalid size');
+    if (size < 8 && size != 1) {
+      final paramsLog = 'size: $size, type: $type, startOffset: $startOffset, '
+          'realSize: $realSize';
+      throw Exception('Invalid size, current params: $paramsLog');
     }
 
     if (type == 'ftyp') {

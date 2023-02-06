@@ -63,6 +63,7 @@ class AsyncFtypBox extends AsyncBmffBox {
           realSize: realSize,
         );
 
+  @override
   Future<void> init() async {
     majorBrand = await context
         .getRangeData(startOffset + 8, startOffset + 12)

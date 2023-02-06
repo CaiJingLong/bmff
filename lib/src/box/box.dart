@@ -4,6 +4,8 @@ import 'dart:typed_data';
 import 'package:bmff/bmff.dart';
 import 'package:bmff/src/box_base.dart';
 
+import 'box_factory.dart';
+
 /// {@template bmff.bmff_box}
 ///
 /// A base class for all BMFF boxes.
@@ -33,7 +35,15 @@ class BmffBox extends BmffBoxBase {
   BmffBox? parent;
 
   /// The child boxes of the box.
-  late List<BmffBox> childBoxes = _decodeChildBoxes();
+  List<BmffBox> get childBoxes => _decodeChildBoxes();
+
+  List<BmffBox>? _values;
+
+  @override
+  set forceFullBox(bool? forceFullBox) {
+    super.forceFullBox = forceFullBox;
+    _values = null;
+  }
 
   BmffBox operator [](Object? key) {
     if (key is String) {
@@ -49,13 +59,19 @@ class BmffBox extends BmffBoxBase {
 
   /// See [childBoxes].
   List<BmffBox> _decodeChildBoxes() {
+    if (_values != null) {
+      return _values!;
+    }
+
     try {
       final result = <BmffBox>[];
 
       var currentIndex = startOffset + headerSize + extendInfoSize;
 
+      final factory = BoxFactory();
+
       while (currentIndex < endOffset) {
-        final box = context.makeBox(startIndex: currentIndex, parent: this);
+        final box = factory.makeBox(context, currentIndex, parent: this);
         result.add(box);
         currentIndex = box.endOffset;
       }
@@ -92,6 +108,6 @@ class BmffBox extends BmffBoxBase {
 
   @override
   String toString() {
-    return '$type (len = $realSize)';
+    return '$type (len = $realSize, start = $startOffset, end = $endOffset)';
   }
 }

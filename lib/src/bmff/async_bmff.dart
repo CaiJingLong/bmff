@@ -53,8 +53,9 @@ class AsyncBmffBox extends BmffBoxBase {
 
   final List<AsyncBmffBox> childBoxes = [];
 
-  void addChild(AsyncBmffBox box) {
-    childBoxes.add(box);
+  Future<void> init() async {
+    final children = await AsyncBoxFactory().decodeChildBoxes(this);
+    childBoxes.addAll(children);
   }
 
   /// Get data of the box.
@@ -76,5 +77,10 @@ class AsyncBmffBox extends BmffBoxBase {
   Future<List<int>> getRangeDataByLength(int start, int length) {
     return context.getRangeData(
         dataStartOffset + start, dataStartOffset + start + length);
+  }
+
+  @override
+  String toString() {
+    return '$type (len = $realSize, start = $startOffset, end = $endOffset)';
   }
 }

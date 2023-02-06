@@ -32,7 +32,7 @@ void main() {
     final bytes = File(assetFilePath).readAsBytesSync();
     late AsyncBmff bmff;
     setUp(() async {
-      bmff = await Bmff.asyncContext(MemoryAsyncBmffContext.memory(bytes));
+      bmff = await Bmff.asyncContext(AsyncBmffContext.memory(bytes));
     });
 
     test('Test box count', () async {
