@@ -1,8 +1,8 @@
+import 'dart:developer';
 import 'dart:typed_data';
 
 import 'package:bmff/bmff.dart';
-
-import 'full_box_type.dart';
+import 'package:bmff/src/box_base.dart';
 
 /// {@template bmff.bmff_box}
 ///
@@ -11,15 +11,20 @@ import 'full_box_type.dart';
 /// Some boxes are not defined in the standard.
 ///
 /// {@endtemplate}
-class BmffBox extends BoxContainer {
+class BmffBox extends BmffBoxBase {
   /// {@macro bmff.bmff_box}
   BmffBox({
     required this.context,
-    required this.size,
-    required this.type,
-    required this.extendedSize,
-    required this.startOffset,
-  });
+    required int startOffset,
+    required int size,
+    required String type,
+    required int realSize,
+  }) : super(
+          realSize: realSize,
+          startOffset: startOffset,
+          size: size,
+          type: type,
+        );
 
   /// {@macro bmff.bmff_context}
   final BmffContext context;
@@ -27,77 +32,20 @@ class BmffBox extends BoxContainer {
   /// The parent box of this box, or null if this box is the root box.
   BmffBox? parent;
 
-  /// The size of the box. Contains the header size.
-  final int size;
-
-  /// The type of the box.
-  final String type;
-
-  /// If the box is large box, it contains the extended size. Otherwise, it is 0.
-  final int extendedSize;
-
-  /// Whether the box is large box.
-  bool get isLargeBox => size == 1;
-
-  /// Whether the box is a full box.
-  bool get isFullBox {
-    return fullBoxType.contains(type);
-  }
-
-  /// The box real size;
-  int get realSize {
-    if (isLargeBox) {
-      return extendedSize;
-    } else if (size == 0) {
-      return context.length - startOffset;
-    } else {
-      return size;
-    }
-  }
-
-  /// The start offset of the box.
-  final int startOffset;
-
-  /// The end offset of the box.
-  late int endOffset = _getEndOffset();
-
-  /// See [endOffset].
-  int _getEndOffset() {
-    if (size == 0) {
-      return context.length;
-    }
-    if (size == 1) {
-      // large box, read the extended size, from the next 8 bytes
-      return startOffset + extendedSize;
-    }
-
-    if (size < 8) {
-      throw Exception('Invalid size');
-    }
-
-    return startOffset + size;
-  }
-
-  /// The header size of the box.
-  int get headerSize {
-    if (size == 0) {
-      return 8;
-    }
-    if (size == 1) {
-      // full box, read the extended size, from the next 8 bytes
-      return 16;
-    }
-
-    return 8;
-  }
-
-  /// Some boxes have some extended data.
-  /// For example, meta of heic have 4 bytes extended data.
-  int get extendInfoSize => isFullBox ? 4 : 0;
-
   /// The child boxes of the box.
-  @override
   late List<BmffBox> childBoxes = _decodeChildBoxes();
+
+  BmffBox operator [](Object? key) {
+    if (key is String) {
+      return childBoxes.firstWhere(
+        (element) => element.type == key,
+        orElse: () => throw NotFoundException(
+          'Not found BmffBox with $key.',
+        ),
+      );
+    }
+    throw NotFoundException('Not found BmffBox with $key.');
+  }
 
   /// See [childBoxes].
   List<BmffBox> _decodeChildBoxes() {
@@ -116,6 +64,7 @@ class BmffBox extends BoxContainer {
     } catch (e) {
       // Here, all data is directly parsed as a box. When an error occurs,
       // it is regarded as no sub box.
+      log('Error occurred when decoding child boxes: $e');
       return [];
     }
   }
@@ -123,13 +72,6 @@ class BmffBox extends BoxContainer {
   /// The data size of the box.
   int get dataSize {
     return endOffset - startOffset - headerSize - extendInfoSize;
-  }
-
-  /// The start offset of the box data.
-  late int dataStartOffset = _dataStartOffset();
-
-  int _dataStartOffset() {
-    return startOffset + headerSize + extendInfoSize;
   }
 
   /// Get data of the box.

@@ -2,6 +2,8 @@ import 'dart:collection';
 import 'dart:typed_data';
 
 import 'package:bmff/bmff.dart';
+import 'package:bmff/src/box/box_factory.dart';
+import 'package:bmff/src/box/impl/bmff_impl.dart';
 
 import 'stub.dart'
     if (dart.library.io) 'io_impl.dart'
@@ -54,9 +56,8 @@ import 'stub.dart'
 ///
 /// ```
 /// {@endtemplate}
-class Bmff extends BoxContainer {
-  /// {@macro bmff.bmff_example}
-  Bmff(this.context);
+abstract class Bmff extends BoxContainer {
+  Bmff();
 
   /// Create [Bmff] from file path.
   ///
@@ -71,13 +72,8 @@ class Bmff extends BoxContainer {
   ///
   /// {@macro bmff.bmff_example}
   factory Bmff.memory(List<int> bytes) {
-    return Bmff(BmffMemoryContext(bytes));
+    return ContextBmffImpl(BmffMemoryContext(bytes));
   }
-
-  /// The context of the BMFF file.
-  ///
-  /// {@macro bmff.bmff_context}
-  final BmffContext context;
 
   /// Type box
   FtypBox get typeBox => this['ftyp'] as FtypBox;
@@ -85,37 +81,12 @@ class Bmff extends BoxContainer {
   /// Type of the BMFF file.
   String get type => typeBox.type;
 
-  /// Decode file to [BmffBox]s.
-  ///
-  /// The method will add the [BmffBox]s to the [BmffContext.boxes].
-  ///
-  /// The box:
-  /// {@macro bmff.bmff_box}
-  List<BmffBox> decodeBox() {
-    context.boxes.clear();
-
-    final length = context.length;
-
-    // decode the data
-    var startIndex = 0;
-
-    while (startIndex < length) {
-      final box = context.makeBox(startIndex: startIndex, parent: null);
-      context.boxes.add(box);
-      startIndex += box.realSize;
-    }
-
-    final firstBox = context.boxes.first;
-
-    if (firstBox is FtypBox) {
-      context.ftypeBox = firstBox;
-    }
-
-    return context.boxes;
-  }
-
   @override
-  late List<BmffBox> childBoxes = decodeBox();
+  late List<BmffBox> childBoxes;
+
+  static Future<AsyncBmff> byAsync(AsyncBmffContext context) async {
+    return BoxFactory().createBmffByAsync(context);
+  }
 }
 
 /// Container of [BmffBox].

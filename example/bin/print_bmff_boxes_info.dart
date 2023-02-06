@@ -29,7 +29,7 @@ void _showFileBoxInfo(File file) {
 
   final bmff = Bmff.file(file.absolute.path);
 
-  final boxes = bmff.decodeBox();
+  final boxes = bmff.childBoxes;
 
   for (final box in boxes) {
     showBox(box, 0);

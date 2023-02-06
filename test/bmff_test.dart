@@ -17,9 +17,9 @@ void main() {
     expect(boxes[2].type, equals('mdat'));
   });
 
-  test('Test box size', () {
-    expect(bmff['ftyp'].size, equals(24));
-    expect(bmff['meta'].size, equals(315));
-    expect(bmff['mdat'].size, equals(37933));
+  test('Test box realSize', () {
+    expect(bmff['ftyp'].realSize, equals(24));
+    expect(bmff['meta'].realSize, equals(315));
+    expect(bmff['mdat'].realSize, equals(37933));
   });
 }

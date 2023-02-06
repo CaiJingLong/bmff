@@ -1,4 +1,6 @@
+import 'dart:async';
 import 'dart:convert';
+import 'dart:developer';
 
 import 'package:bmff/bmff.dart';
 
@@ -25,6 +27,22 @@ class BoxFactory {
     // print('size: $size');
     _checkType(typeData);
 
+    var realSize = size;
+    if (size == 1) {
+      realSize =
+          context.getRangeData(startIndex + 8, startIndex + 16).toBigEndian(8);
+    }
+
+    return _createBmffBox(typeData, size, context, startIndex, realSize);
+  }
+
+  BmffBox _createBmffBox(
+    List<int> typeData,
+    int size,
+    BmffContext context,
+    int startIndex,
+    int realSize,
+  ) {
     final type = typeData.toAsciiString();
 
     if (size == 0) {
@@ -32,20 +50,7 @@ class BoxFactory {
         context: context,
         size: size,
         type: type,
-        extendedSize: 0,
-        startOffset: startIndex,
-      );
-    }
-    if (size == 1) {
-      // Full box, read the extended size, from the next 8 bytes
-      final extendedSize =
-          context.getRangeData(startIndex + 8, startIndex + 16).toBigEndian(8);
-
-      return BmffBox(
-        context: context,
-        size: 1,
-        type: type,
-        extendedSize: extendedSize,
+        realSize: realSize,
         startOffset: startIndex,
       );
     }
@@ -59,7 +64,7 @@ class BoxFactory {
         context: context,
         size: size,
         type: type,
-        dataSize: size - 8,
+        realSize: realSize,
         startOffset: startIndex,
       );
     }
@@ -68,7 +73,7 @@ class BoxFactory {
       context: context,
       size: size,
       type: type,
-      extendedSize: 0,
+      realSize: realSize,
       startOffset: startIndex,
     );
   }
@@ -79,9 +84,23 @@ class BoxFactory {
       if (!((value >= 0x41 && value <= 0x5a) ||
           (value >= 0x61 && value <= 0x7a) ||
           (value >= 0x30 && value <= 0x39))) {
-        throw Exception(
-            'Invalid box type, the type char list is ${ascii.decode(typeData)}');
+        final errorLog =
+            'Invalid box type, the type char list is ${ascii.decode(typeData)}';
+        log(errorLog);
+        throw Exception(errorLog);
       }
     }
+  }
+
+  FutureOr<AsyncBmff> createBmffByAsync(AsyncBmffContext context) async {
+    final bmff = AsyncBmff(context);
+
+    await bmff.init();
+
+    return bmff;
+  }
+
+  List<AsyncBmffBox> decodeAsyncBoxes(AsyncBmff asyncBmff) {
+    throw UnimplementedError();
   }
 }

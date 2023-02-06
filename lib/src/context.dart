@@ -1,5 +1,6 @@
 import 'package:bmff/bmff.dart';
 import 'package:bmff/src/box/box_factory.dart';
+import 'package:bmff/src/box/impl/bmff_impl.dart';
 
 /// {@template bmff.bmff_context}
 ///
@@ -13,9 +14,6 @@ import 'package:bmff/src/box/box_factory.dart';
 abstract class BmffContext {
   /// The boxes of the context.
   final boxes = <BmffBox>[];
-
-  /// The all boxes of the context. All of boxes have been decoded.
-  late List<BmffBox> allBox = _allBox(this);
 
   /// The FTYP box of the context.
   late FtypBox ftypeBox;
@@ -44,27 +42,7 @@ abstract class BmffContext {
     return _boxFactory.makeBox(this, startIndex, parent: parent);
   }
 
-  static List<BmffBox> _allBox(BmffContext context) {
-    final result = <BmffBox>[];
-    final bmff = Bmff(context);
-    final allBox = bmff.decodeBox();
-    for (final box in allBox) {
-      result.add(box);
-      result.addAll(_decodeBox(box));
-    }
-    return result;
-  }
-
-  static Iterable<BmffBox> _decodeBox(BmffBox box) {
-    final result = <BmffBox>[];
-    for (final child in box.childBoxes) {
-      result.add(child);
-      result.addAll(_decodeBox(child));
-    }
-    return result;
-  }
-
-  late Bmff bmff = Bmff(this);
+  late Bmff bmff = ContextBmffImpl(this);
 }
 
 /// {@template bmff.BmffMemoryContext}
@@ -92,4 +70,32 @@ class BmffMemoryContext extends BmffContext {
 
   @override
   void close() {}
+}
+
+typedef LengthGetter = Future<int> Function();
+typedef RangeDataGetter = Future<List<int>> Function(int start, int end);
+
+abstract class AsyncBmffContext {
+  const AsyncBmffContext();
+
+  Future<int> lengthAsync();
+
+  Future<List<int>> getRangeData(int start, int end);
+}
+
+class MemoryAsyncBmffContext extends AsyncBmffContext {
+  MemoryAsyncBmffContext(this.lengthAsyncGetter, this.rangeDataGetter);
+
+  final LengthGetter lengthAsyncGetter;
+  final RangeDataGetter rangeDataGetter;
+
+  @override
+  Future<int> lengthAsync() {
+    return lengthAsyncGetter();
+  }
+
+  @override
+  Future<List<int>> getRangeData(int start, int end) {
+    return rangeDataGetter.call(start, end);
+  }
 }

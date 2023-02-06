@@ -10,19 +10,18 @@ import 'package:bmff/bmff.dart';
 ///
 /// {@endtemplate}
 class FtypBox extends BmffBox {
-  /// {@macro bmff.ftyp_box}
   FtypBox({
     required BmffContext context,
+    required int startOffset,
     required int size,
     required String type,
-    required int dataSize,
-    required int startOffset,
+    required int realSize,
   }) : super(
           context: context,
+          startOffset: startOffset,
           size: size,
           type: type,
-          extendedSize: 0,
-          startOffset: startOffset,
+          realSize: realSize,
         );
 
   /// Major brand.
