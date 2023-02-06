@@ -1,9 +1,7 @@
 import 'dart:collection';
-import 'dart:typed_data';
 
 import 'package:bmff/bmff.dart';
 import 'package:bmff/src/box/box_factory.dart';
-import 'package:bmff/src/box_base.dart';
 
 class AsyncBmff extends UnmodifiableMapBase<String, AsyncBmffBox> {
   AsyncBmff(this.context);
