@@ -3,7 +3,6 @@ import 'dart:convert';
 import 'dart:developer';
 
 import 'package:bmff/bmff.dart';
-import 'package:bmff/src/box/impl/bmff_impl.dart';
 
 void _checkType(List<int> typeData) {
   // type data must a-zA-Z0-9
