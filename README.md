@@ -115,7 +115,8 @@ class AsyncBmffContextHttp extends AsyncBmffContext {
     });
     if (response.statusCode != 206) {
       throw Exception(
-          'Current http status code is ${response.statusCode}, not 206, not support range download');
+          'Current http status code is ${response.statusCode},' +
+          ' not 206, not support range download');
     }
     final bytes = response.bodyBytes;
     return bytes;
