@@ -42,6 +42,7 @@ class BmffBoxBase {
     return startOffset + realSize;
   }
 
+  /// The data start offset of the box.
   int get dataStartOffset => startOffset + headerSize + extendInfoSize;
 
   /// The header size of the box.
@@ -63,6 +64,6 @@ class BmffBoxBase {
 
   /// The data size of the box.
   int get dataSize {
-    return endOffset - startOffset - headerSize - extendInfoSize;
+    return endOffset - dataStartOffset;
   }
 }

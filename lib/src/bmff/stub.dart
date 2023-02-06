@@ -1,8 +1,9 @@
 import 'package:bmff/bmff.dart';
 
-/// Create [Bmff] from file path. The method is not available on web.
 ///
-/// {@template bmff.bmff_for_web}
+/// {@template bmff.createBmffFromFile}
+///
+/// Create [Bmff] from file path. The method is not available on web.
 ///
 /// For code compatibility, the web can call this method, but an error will be reported.
 ///

@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:bmff/bmff.dart';
 
+/// {@macro bmff.createBmffFromFile}
 Bmff createBmffFromFile(String path) {
   return BmffIoContext(File(path)).bmff;
 }

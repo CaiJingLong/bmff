@@ -112,6 +112,7 @@ class BmffBox extends BmffBoxBase {
   }
 }
 
+/// {@template bmff.bmff_box_base}
 class AsyncBmffBox extends BmffBoxBase {
   AsyncBmffBox({
     required this.context,

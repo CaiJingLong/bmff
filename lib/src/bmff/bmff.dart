@@ -81,6 +81,7 @@ abstract class Bmff extends BoxContainer {
   @override
   late List<BmffBox> childBoxes;
 
+  /// {@macro bmff.async_bmff}
   static Future<AsyncBmff> asyncContext(AsyncBmffContext context) async {
     return AsyncBoxFactory().createBmffByAsync(context);
   }

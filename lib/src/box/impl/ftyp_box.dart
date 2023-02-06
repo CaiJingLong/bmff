@@ -74,10 +74,13 @@ class AsyncFtypBox extends AsyncBmffBox {
     compatibleBrands = await _getCompatibleVersions();
   }
 
+  /// Major brand.
   late String majorBrand;
 
+  /// Minor version.
   late String minorVersion;
 
+  /// Compatible brands. it may be empty.
   late List<String> compatibleBrands;
 
   Future<List<String>> _getCompatibleVersions() async {

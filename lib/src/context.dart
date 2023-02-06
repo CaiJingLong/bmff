@@ -70,7 +70,7 @@ abstract class AsyncBmffContext {
   /// Get the data from [start] to [end].
   Future<List<int>> getRangeData(int start, int end);
 
-  /// Create a [MemoryAsyncBmffContext] from [bytes].
+  /// Create a [AsyncBmffContext] from [bytes].
   factory AsyncBmffContext.memory(List<int> bytes) {
     return MemoryAsyncBmffContext(
       () async => bytes.length,
