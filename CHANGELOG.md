@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 1.3.1
+
+- Fix: `AsyncBmffBox` `updateForceFullBox` method, will update all box in `children
+
 ## 1.3.0
 
 - Add `[]` method to `AsyncBmffBox`
