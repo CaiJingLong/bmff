@@ -1,5 +1,5 @@
 import 'package:bmff/bmff.dart';
-import 'package:bmff/src/box/box_factory.dart';
+import 'package:bmff/src/box/impl/bmff_impl.dart';
 
 /// {@template bmff.bmff_context}
 ///
@@ -11,15 +11,6 @@ import 'package:bmff/src/box/box_factory.dart';
 ///
 /// {@endtemplate}
 abstract class BmffContext {
-  /// The boxes of the context.
-  final boxes = <BmffBox>[];
-
-  /// The all boxes of the context. All of boxes have been decoded.
-  late List<BmffBox> allBox = _allBox(this);
-
-  /// The FTYP box of the context.
-  late FtypBox ftypeBox;
-
   /// The length of the context.
   int get length;
 
@@ -32,39 +23,7 @@ abstract class BmffContext {
   /// Release the context.
   void close();
 
-  /// {@macro bmff.box_factory}
-  final _boxFactory = BoxFactory();
-
-  void resgiterBox(BmffBox box) {
-    boxes.add(box);
-  }
-
-  /// Decode [BmffBox] from [startIndex].
-  BmffBox makeBox({required int startIndex, BmffBox? parent}) {
-    return _boxFactory.makeBox(this, startIndex, parent: parent);
-  }
-
-  static List<BmffBox> _allBox(BmffContext context) {
-    final result = <BmffBox>[];
-    final bmff = Bmff(context);
-    final allBox = bmff.decodeBox();
-    for (final box in allBox) {
-      result.add(box);
-      result.addAll(_decodeBox(box));
-    }
-    return result;
-  }
-
-  static Iterable<BmffBox> _decodeBox(BmffBox box) {
-    final result = <BmffBox>[];
-    for (final child in box.childBoxes) {
-      result.add(child);
-      result.addAll(_decodeBox(child));
-    }
-    return result;
-  }
-
-  late Bmff bmff = Bmff(this);
+  late Bmff bmff = ContextBmffImpl(this);
 }
 
 /// {@template bmff.BmffMemoryContext}
@@ -92,4 +51,56 @@ class BmffMemoryContext extends BmffContext {
 
   @override
   void close() {}
+}
+
+typedef LengthGetter = Future<int> Function();
+typedef RangeDataGetter = Future<List<int>> Function(int start, int end);
+
+/// {@template bmff.AsyncBmffContext}
+///
+/// The async context of a BMFF file.
+///
+/// {@endtemplate}
+abstract class AsyncBmffContext {
+  const AsyncBmffContext();
+
+  /// The length of the context.
+  Future<int> lengthAsync();
+
+  /// Get the data from [start] to [end].
+  Future<List<int>> getRangeData(int start, int end);
+
+  /// Create a [MemoryAsyncBmffContext] from [bytes].
+  factory AsyncBmffContext.memory(List<int> bytes) {
+    return MemoryAsyncBmffContext(
+      () async => bytes.length,
+      (start, end) async => bytes.sublist(start, end),
+    );
+  }
+}
+
+/// {@template bmff.MemoryAsyncBmffContext}
+///
+/// The context of a BMFF file in memory.
+///
+/// {@endtemplate}
+class MemoryAsyncBmffContext extends AsyncBmffContext {
+  /// {@macro bmff.MemoryAsyncBmffContext}
+  const MemoryAsyncBmffContext(this.lengthAsyncGetter, this.rangeDataGetter);
+
+  /// Get the length of the context.
+  final LengthGetter lengthAsyncGetter;
+
+  /// Get the data of the context.
+  final RangeDataGetter rangeDataGetter;
+
+  @override
+  Future<int> lengthAsync() {
+    return lengthAsyncGetter();
+  }
+
+  @override
+  Future<List<int>> getRangeData(int start, int end) {
+    return rangeDataGetter.call(start, end);
+  }
 }

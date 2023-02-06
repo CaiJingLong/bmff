@@ -4,7 +4,14 @@ import 'package:bmff/bmff.dart';
 import 'package:example/utils.dart';
 
 Future<void> main(List<String> args) async {
-  final file = File('assets/compare_still_1.heic');
+  String path;
+  if (args.isEmpty) {
+    path = 'assets/compare_still_1.heic';
+  } else {
+    path = args[0];
+  }
+
+  final file = File(path);
   _showFileBoxInfo(file);
 
   print('-' * 60);
@@ -29,7 +36,7 @@ void _showFileBoxInfo(File file) {
 
   final bmff = Bmff.file(file.absolute.path);
 
-  final boxes = bmff.decodeBox();
+  final boxes = bmff.childBoxes;
 
   for (final box in boxes) {
     showBox(box, 0);

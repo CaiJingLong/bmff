@@ -44,7 +44,7 @@ const List<String> fullBoxType = [
   'tsel',
   'kind',
   'meta',
-  'xml ',
+  'xml',
   'bxml',
   'iloc',
   'pitm',
@@ -67,4 +67,10 @@ const List<String> fullBoxType = [
   'uri',
   'uriI',
   'hmhd',
+];
+
+/// The full box type list. Just invlid, not document define.
+final simpleTypes = [
+  'meta',
+  'iloc',
 ];

@@ -10,19 +10,18 @@ import 'package:bmff/bmff.dart';
 ///
 /// {@endtemplate}
 class FtypBox extends BmffBox {
-  /// {@macro bmff.ftyp_box}
   FtypBox({
     required BmffContext context,
+    required int startOffset,
     required int size,
     required String type,
-    required int dataSize,
-    required int startOffset,
+    required int realSize,
   }) : super(
           context: context,
+          startOffset: startOffset,
           size: size,
           type: type,
-          extendedSize: 0,
-          startOffset: startOffset,
+          realSize: realSize,
         );
 
   /// Major brand.
@@ -43,6 +42,51 @@ class FtypBox extends BmffBox {
     while (index < realSize) {
       compatibleVersions
           .add(context.getRangeData(index, index + 4).toAsciiString());
+      index += 4;
+    }
+    return compatibleVersions;
+  }
+}
+
+class AsyncFtypBox extends AsyncBmffBox {
+  AsyncFtypBox({
+    required AsyncBmffContext context,
+    required int startOffset,
+    required int size,
+    required String type,
+    required int realSize,
+  }) : super(
+          context: context,
+          startOffset: startOffset,
+          size: size,
+          type: type,
+          realSize: realSize,
+        );
+
+  @override
+  Future<void> init() async {
+    majorBrand = await context
+        .getRangeData(startOffset + 8, startOffset + 12)
+        .then((value) => value.toAsciiString());
+    minorVersion = await context
+        .getRangeData(startOffset + 12, startOffset + 16)
+        .then((value) => value.toAsciiString());
+    compatibleBrands = await _getCompatibleVersions();
+  }
+
+  late String majorBrand;
+
+  late String minorVersion;
+
+  late List<String> compatibleBrands;
+
+  Future<List<String>> _getCompatibleVersions() async {
+    final compatibleVersions = <String>[];
+    var index = startOffset + 16;
+    while (index < realSize) {
+      compatibleVersions.add(await context
+          .getRangeData(index, index + 4)
+          .then((value) => value.toAsciiString()));
       index += 4;
     }
     return compatibleVersions;
