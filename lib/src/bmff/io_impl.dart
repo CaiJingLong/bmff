@@ -4,8 +4,11 @@ import 'package:bmff/bmff.dart';
 import 'package:bmff/src/box/full_box_type.dart';
 
 /// {@macro bmff.createBmffFromFile}
-Bmff createBmffFromFile(String path) {
-  return BmffIoContext(File(path)).bmff;
+Bmff createBmffFromFile(
+  String path, {
+  List<String> fullBoxTypes = fullBoxType,
+}) {
+  return BmffIoContext(File(path), fullBoxTypes: fullBoxTypes).bmff;
 }
 
 /// {@template bmff.BmffIoContext}

@@ -1,5 +1,5 @@
 import 'package:bmff/bmff.dart';
-import 'package:bmff/src/box/box_factory.dart';
+import 'package:bmff/src/factory/box_factory.dart';
 
 class ContextBmffImpl extends Bmff {
   /// {@macro bmff.bmff_example}

@@ -1,5 +1,6 @@
 import 'package:bmff/bmff.dart';
-import 'package:bmff/src/box/box_factory.dart';
+import 'package:bmff/src/factory/box_factory.dart';
+import 'package:bmff/src/box/full_box_type.dart';
 import 'package:bmff/src/box/impl/bmff_impl.dart';
 
 import 'stub.dart'
@@ -61,15 +62,24 @@ abstract class Bmff extends BoxContainer {
   /// {@macro bmff.bmff_for_web}
   ///
   /// {@macro bmff.bmff_example}
-  factory Bmff.file(String path) {
+  factory Bmff.file(
+    String path, {
+    List<String> fullBoxtypes = fullBoxType,
+  }) {
     return createBmffFromFile(path);
   }
 
   /// Create [Bmff] from [bytes].
   ///
   /// {@macro bmff.bmff_example}
-  factory Bmff.memory(List<int> bytes) {
-    return ContextBmffImpl(BmffMemoryContext(bytes));
+  factory Bmff.memory(
+    List<int> bytes, {
+    List<String> fullBoxTypes = fullBoxType,
+  }) {
+    return ContextBmffImpl(BmffMemoryContext(
+      bytes,
+      fullBoxTypes: fullBoxTypes,
+    ));
   }
 
   /// Type box

@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 1.4.2
+
+- Fix: decode box error
+
 ## 1.4.1
 
 - Fix: `BaseBmffContext` constructor

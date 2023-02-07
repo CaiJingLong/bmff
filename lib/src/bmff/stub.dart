@@ -1,4 +1,5 @@
 import 'package:bmff/bmff.dart';
+import 'package:bmff/src/box/full_box_type.dart';
 
 ///
 /// {@template bmff.createBmffFromFile}
@@ -8,6 +9,7 @@ import 'package:bmff/bmff.dart';
 /// For code compatibility, the web can call this method, but an error will be reported.
 ///
 /// {@endtemplate}
-Bmff createBmffFromFile(String path) {
+Bmff createBmffFromFile(String path,
+    {List<String> fullBoxTypes = fullBoxType}) {
   throw UnimplementedError();
 }

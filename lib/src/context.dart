@@ -102,10 +102,23 @@ abstract class AsyncBmffContext extends BaseBmffContext {
   Future<List<int>> getRangeData(int start, int end);
 
   /// Create a [AsyncBmffContext] from [bytes].
-  factory AsyncBmffContext.memory(List<int> bytes) {
-    return MemoryAsyncBmffContext(
-      () async => bytes.length,
-      (start, end) async => bytes.sublist(start, end),
+  factory AsyncBmffContext.bytes(
+    List<int> bytes, {
+    List<String> fullBoxTypes = fullBoxType,
+  }) {
+    return MemoryAsyncBmffContext(bytes, fullBoxTypes: fullBoxTypes);
+  }
+
+  /// Create a [AsyncBmffContext] from [lengthAsyncGetter] and [rangeDataGetter].
+  factory AsyncBmffContext.common(
+    LengthGetter lengthAsyncGetter,
+    RangeDataGetter rangeDataGetter, {
+    List<String> fullBoxTypes = fullBoxType,
+  }) {
+    return _CommonAsyncBmffContext(
+      lengthAsyncGetter,
+      rangeDataGetter,
+      fullBoxTypes: fullBoxTypes,
     );
   }
 }
@@ -115,9 +128,9 @@ abstract class AsyncBmffContext extends BaseBmffContext {
 /// The context of a BMFF file in memory.
 ///
 /// {@endtemplate}
-class MemoryAsyncBmffContext extends AsyncBmffContext {
+class _CommonAsyncBmffContext extends AsyncBmffContext {
   /// {@macro bmff.MemoryAsyncBmffContext}
-  const MemoryAsyncBmffContext(
+  const _CommonAsyncBmffContext(
     this.lengthAsyncGetter,
     this.rangeDataGetter, {
     List<String> fullBoxTypes = fullBoxType,
@@ -137,5 +150,34 @@ class MemoryAsyncBmffContext extends AsyncBmffContext {
   @override
   Future<List<int>> getRangeData(int start, int end) {
     return rangeDataGetter.call(start, end);
+  }
+}
+
+/// {@template bmff.MemoryAsyncBmffContext}
+/// The context of a BMFF file in memory.
+///
+/// This is a simple implementation of [AsyncBmffContext].
+///
+/// You can use [AsyncBmffContext.bytes] to use this.
+///
+/// {@endtemplate}
+class MemoryAsyncBmffContext extends AsyncBmffContext {
+  /// {@macro bmff.MemoryAsyncBmffContext}
+  const MemoryAsyncBmffContext(
+    this.bytes, {
+    List<String> fullBoxTypes = fullBoxType,
+  }) : super(fullBoxTypes: fullBoxTypes);
+
+  /// The bytes of the context.
+  final List<int> bytes;
+
+  @override
+  Future<int> lengthAsync() {
+    return Future.value(bytes.length);
+  }
+
+  @override
+  Future<List<int>> getRangeData(int start, int end) {
+    return Future.value(bytes.sublist(start, end));
   }
 }

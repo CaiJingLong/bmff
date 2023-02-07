@@ -32,7 +32,14 @@ void main() {
     final bytes = File(assetFilePath).readAsBytesSync();
     late AsyncBmff bmff;
     setUp(() async {
-      bmff = await Bmff.asyncContext(AsyncBmffContext.memory(bytes));
+      final context = AsyncBmffContext.bytes(
+        bytes,
+        fullBoxTypes: [
+          'meta',
+          'iinf',
+        ],
+      );
+      bmff = await Bmff.asyncContext(context);
     });
 
     test('Test box count', () async {
@@ -50,6 +57,32 @@ void main() {
       expect((bmff['ftyp'].realSize), equals(24));
       expect((bmff['meta'].realSize), equals(315));
       expect((bmff['mdat'].realSize), equals(37933));
+    });
+
+    group('Test box child boxes', () {
+      test('box length and level 1', () async {
+        final meta = bmff['meta'];
+        expect(meta.childBoxes.length, equals(6));
+        expect(meta.childBoxes[0].type, equals('hdlr'));
+        expect(meta.childBoxes[1].type, equals('pitm'));
+        expect(meta.childBoxes[2].type, equals('iloc'));
+        expect(meta.childBoxes[3].type, equals('iinf'));
+        expect(meta.childBoxes[4].type, equals('iref'));
+        expect(meta.childBoxes[5].type, equals('iprp'));
+      });
+
+      // test('iinf', () async {
+      //   final iinf = bmff['meta']['iinf'];
+      //   expect(iinf.childBoxes.length, equals(1));
+      //   expect(iinf.childBoxes[0].type, equals('infe'));
+      // });
+
+      test('iprp', () async {
+        final iprp = bmff['meta']['iprp'];
+        expect(iprp.childBoxes.length, equals(2));
+        expect(iprp.childBoxes[0].type, equals('ipco'));
+        expect(iprp.childBoxes[1].type, equals('ipma'));
+      });
     });
   });
 }

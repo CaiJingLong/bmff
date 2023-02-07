@@ -29,8 +29,9 @@ void _checkType(List<int> typeData) {
 ///
 /// {@endtemplate}
 class BoxFactory {
-  BmffBox makeBox(BmffContext context, int startIndex, {BmffBox? parent}) {
-    final box = _makeBox(context, startIndex);
+  BmffBox makeBox(BmffContext context, int startOffset, {BmffBox? parent}) {
+    final parentEndOffset = parent?.endOffset ?? context.length;
+    final box = _makeBox(context, startOffset, parentEndOffset);
     box.parent = parent;
     if (parent != null && box.endOffset > parent.endOffset) {
       throw Exception('Invalid box, end offset is larger than parent');
@@ -38,21 +39,26 @@ class BoxFactory {
     return box;
   }
 
-  BmffBox _makeBox(BmffContext context, int startIndex) {
+  BmffBox _makeBox(BmffContext context, int startOffset, int parentEndOffset) {
     final size =
-        context.getRangeData(startIndex, startIndex + 4).toBigEndian(4);
-    final typeData = context.getRangeData(startIndex + 4, startIndex + 8);
+        context.getRangeData(startOffset, startOffset + 4).toBigEndian(4);
+    final typeData = context.getRangeData(startOffset + 4, startOffset + 8);
     // print('type: ${typeData.toAsciiString()}');
     // print('size: $size');
     _checkType(typeData);
 
     var realSize = size;
     if (size == 1) {
-      realSize =
-          context.getRangeData(startIndex + 8, startIndex + 16).toBigEndian(8);
+      realSize = context
+          .getRangeData(startOffset + 8, startOffset + 16)
+          .toBigEndian(8);
     }
 
-    return _createBmffBox(typeData, size, context, startIndex, realSize);
+    if (realSize == 0) {
+      realSize = parentEndOffset - startOffset;
+    }
+
+    return _createBmffBox(typeData, size, context, startOffset, realSize);
   }
 
   BmffBox _createBmffBox(
@@ -121,7 +127,7 @@ class AsyncBoxFactory {
 
       var startOffset = 0;
       while (startOffset < length) {
-        final box = await _makeBox(context, startOffset);
+        final box = await _makeBox(context, startOffset, length);
         boxes.add(box);
         startOffset += box.realSize;
       }
@@ -138,15 +144,20 @@ class AsyncBoxFactory {
     try {
       final boxes = <AsyncBmffBox>[];
 
-      var startOffset = parent.dataStartOffset;
+      if (parent.dataSize <= 0) {
+        return [];
+      }
 
-      while (startOffset < parent.endOffset) {
-        final box = await _makeBox(context, startOffset);
+      var childStartOffset = parent.dataStartOffset;
+
+      while (childStartOffset < parent.endOffset) {
+        final box = await _makeBox(context, childStartOffset, parent.endOffset);
         if (box.endOffset > parent.endOffset) {
           throw Exception('Invalid box, end offset is larger than parent');
         }
+        if (box.realSize <= 8) {}
         boxes.add(box);
-        startOffset += box.realSize;
+        childStartOffset += box.realSize;
       }
 
       return boxes;
@@ -156,12 +167,16 @@ class AsyncBoxFactory {
   }
 
   Future<AsyncBmffBox> _makeBox(
-      AsyncBmffContext context, int startOffset) async {
-    final size = (await context.getRangeData(startOffset, startOffset + 4))
-        .toBigEndian();
+    AsyncBmffContext context,
+    int startOffset,
+    int parentEndOffset,
+  ) async {
+    final size = await context
+        .getRangeData(startOffset, startOffset + 4)
+        .then((value) => value.toBigEndian());
 
     final typeData =
-        (await context.getRangeData(startOffset + 4, startOffset + 8));
+        await context.getRangeData(startOffset + 4, startOffset + 8);
 
     _checkType(typeData);
 
@@ -169,8 +184,13 @@ class AsyncBoxFactory {
 
     var realSize = size;
     if (size == 1) {
-      realSize = (await context.getRangeData(startOffset + 8, startOffset + 16))
-          .toBigEndian();
+      realSize = await context
+          .getRangeData(startOffset + 8, startOffset + 16)
+          .then((value) => value.toBigEndian());
+    }
+
+    if (realSize == 0) {
+      realSize = parentEndOffset - startOffset;
     }
 
     return _createBmffBox(type, size, context, startOffset, realSize);

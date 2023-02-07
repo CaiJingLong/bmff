@@ -4,7 +4,7 @@ import 'dart:typed_data';
 import 'package:bmff/bmff.dart';
 import 'package:bmff/src/box_base.dart';
 
-import 'box_factory.dart';
+import '../factory/box_factory.dart';
 
 /// {@template bmff.bmff_box}
 ///
@@ -137,6 +137,10 @@ class AsyncBmffBox extends BmffBoxBase {
   Future<void> init() async {
     final children = await AsyncBoxFactory().decodeChildBoxes(this);
     childBoxes.addAll(children);
+
+    for (final child in children) {
+      await child.init();
+    }
   }
 
   Future<void> updateForceFullBox(bool? forceFullBox) async {
@@ -147,9 +151,6 @@ class AsyncBmffBox extends BmffBoxBase {
   Future<void> _updateChildBoxes() async {
     childBoxes.clear();
     await init();
-    for (final child in childBoxes) {
-      await child._updateChildBoxes();
-    }
   }
 
   /// Get data of the box.

@@ -1,7 +1,7 @@
 import 'dart:collection';
 
 import 'package:bmff/bmff.dart';
-import 'package:bmff/src/box/box_factory.dart';
+import 'package:bmff/src/factory/box_factory.dart';
 
 /// {@template bmff.async_bmff}
 ///
