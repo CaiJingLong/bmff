@@ -1,6 +1,28 @@
 import 'package:bmff/bmff.dart';
 import 'package:bmff/src/box/impl/bmff_impl.dart';
 
+import 'box/full_box_type.dart';
+
+/// Some base configurations.
+abstract class BaseBmffContext {
+  /// Some base configurations.
+  const BaseBmffContext([
+    this.fullBoxTypes = fullBoxType,
+  ]);
+
+  /// You can use your own full box types.
+  ///
+  /// Because some boxes are not defined in the standard.
+  ///
+  ///
+  final List<String> fullBoxTypes;
+
+  /// Whether the box is a full box.
+  bool isFullBox(String type) {
+    return fullBoxTypes.contains(type);
+  }
+}
+
 /// {@template bmff.bmff_context}
 ///
 /// The context of a BMFF file.
@@ -10,7 +32,7 @@ import 'package:bmff/src/box/impl/bmff_impl.dart';
 /// User need to implement [getRangeData], and [length].
 ///
 /// {@endtemplate}
-abstract class BmffContext {
+abstract class BmffContext extends BaseBmffContext {
   /// The length of the context.
   int get length;
 
@@ -61,7 +83,7 @@ typedef RangeDataGetter = Future<List<int>> Function(int start, int end);
 /// The async context of a BMFF file.
 ///
 /// {@endtemplate}
-abstract class AsyncBmffContext {
+abstract class AsyncBmffContext extends BaseBmffContext {
   const AsyncBmffContext();
 
   /// The length of the context.

@@ -110,6 +110,9 @@ class BmffBox extends BmffBoxBase {
   String toString() {
     return '$type (len = $realSize, start = $startOffset, end = $endOffset)';
   }
+
+  @override
+  BaseBmffContext get baseContext => context;
 }
 
 /// {@template bmff.bmff_box_base}
@@ -186,4 +189,7 @@ class AsyncBmffBox extends BmffBoxBase {
   String toString() {
     return '$type (len = $realSize, start = $startOffset, end = $endOffset)';
   }
+
+  @override
+  BaseBmffContext get baseContext => context;
 }

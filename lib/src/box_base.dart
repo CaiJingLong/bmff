@@ -1,6 +1,6 @@
-import 'box/full_box_type.dart';
+import 'package:bmff/bmff.dart';
 
-class BmffBoxBase {
+abstract class BmffBoxBase {
   /// The size of the box. Contains the header size.
   final int size;
 
@@ -25,13 +25,14 @@ class BmffBoxBase {
 
   bool? forceFullBox;
 
+  BaseBmffContext get baseContext;
+
   /// Whether the box is a full box.
   bool get isFullBox {
     if (forceFullBox != null) {
       return forceFullBox!;
     }
-    // return fullBoxType.contains(type);
-    return simpleTypes.contains(type);
+    return baseContext.isFullBox(type);
   }
 
   /// The end offset of the box.
