@@ -33,6 +33,10 @@ abstract class BaseBmffContext {
 ///
 /// {@endtemplate}
 abstract class BmffContext extends BaseBmffContext {
+  BmffContext({
+    List<String> fullBoxTypes = fullBoxType,
+  }) : super(fullBoxTypes);
+
   /// The length of the context.
   int get length;
 
@@ -55,7 +59,10 @@ abstract class BmffContext extends BaseBmffContext {
 /// {@endtemplate}
 class BmffMemoryContext extends BmffContext {
   /// {@macro bmff.BmffMemoryContext}
-  BmffMemoryContext(this.bytes);
+  BmffMemoryContext(
+    this.bytes, {
+    List<String> fullBoxTypes = fullBoxType,
+  }) : super(fullBoxTypes: fullBoxTypes);
 
   /// The bytes of the context.
   final List<int> bytes;
@@ -84,7 +91,9 @@ typedef RangeDataGetter = Future<List<int>> Function(int start, int end);
 ///
 /// {@endtemplate}
 abstract class AsyncBmffContext extends BaseBmffContext {
-  const AsyncBmffContext();
+  const AsyncBmffContext({
+    List<String> fullBoxTypes = fullBoxType,
+  }) : super(fullBoxTypes);
 
   /// The length of the context.
   Future<int> lengthAsync();
@@ -108,7 +117,11 @@ abstract class AsyncBmffContext extends BaseBmffContext {
 /// {@endtemplate}
 class MemoryAsyncBmffContext extends AsyncBmffContext {
   /// {@macro bmff.MemoryAsyncBmffContext}
-  const MemoryAsyncBmffContext(this.lengthAsyncGetter, this.rangeDataGetter);
+  const MemoryAsyncBmffContext(
+    this.lengthAsyncGetter,
+    this.rangeDataGetter, {
+    List<String> fullBoxTypes = fullBoxType,
+  }) : super(fullBoxTypes: fullBoxTypes);
 
   /// Get the length of the context.
   final LengthGetter lengthAsyncGetter;

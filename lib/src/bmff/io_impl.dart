@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:bmff/bmff.dart';
+import 'package:bmff/src/box/full_box_type.dart';
 
 /// {@macro bmff.createBmffFromFile}
 Bmff createBmffFromFile(String path) {
@@ -21,7 +22,10 @@ class BmffIoContext extends BmffContext {
   /// {@macro bmff.BmffIoContext}
   ///
   /// {@macro bmff.bmff_example}
-  BmffIoContext(this.file);
+  BmffIoContext(
+    this.file, {
+    List<String> fullBoxTypes = fullBoxType,
+  }) : super(fullBoxTypes: fullBoxTypes);
 
   /// The file of the context.
   final File file;

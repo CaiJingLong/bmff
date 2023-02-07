@@ -1,9 +1,13 @@
 # CHANGELOG
 
+## 1.4.1
+
+- Fix: `BaseBmffContext` constructor
+
 ## 1.4.0
 
-- Add `BaseBmffBox` for `BmffBox` and `AsyncBmffBox`;
-- Add `fullBoxType` for `BmffBox` with `BaseBmffBox`;
+- Add `BaseBmffContext` for `BmffContext` and `AsyncBmffContext`;
+- Support custom full box for bmff;
 
 ## 1.3.1
 
