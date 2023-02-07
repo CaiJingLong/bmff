@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## 1.4.0
+
+- Add `BaseBmffBox` for `BmffBox` and `AsyncBmffBox`;
+- Add `fullBoxType` for `BmffBox` with `BaseBmffBox`;
+
 ## 1.3.1
 
 - Fix: `AsyncBmffBox` `updateForceFullBox` method, will update all box in `children
