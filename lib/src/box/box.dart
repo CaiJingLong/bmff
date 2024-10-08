@@ -13,6 +13,8 @@ import '../factory/box_factory.dart';
 /// Some boxes are not defined in the standard.
 ///
 /// {@endtemplate}
+///
+/// See also [AsyncBmffBox].
 class BmffBox extends BmffBoxBase {
   /// {@macro bmff.bmff_box}
   BmffBox({
@@ -115,7 +117,13 @@ class BmffBox extends BmffBoxBase {
   BaseBmffContext get baseContext => context;
 }
 
-/// {@template bmff.bmff_box_base}
+/// {@template bmff.async_bmff_box}
+///
+/// An asynchronous version of BMFF box.
+///
+/// {@endtemplate}
+///
+/// See also [BmffBox].
 class AsyncBmffBox extends BmffBoxBase {
   AsyncBmffBox({
     required this.context,
